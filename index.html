@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual Hive: Quest for Series A</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            overflow: hidden;
+        }
+        
+        #game-container {
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container"></div>
+    
+    <!-- Load Kaboom.js from CDN -->
+    <script src="https://unpkg.com/kaboom@3000/dist/kaboom.js"></script>
+    
+    <script>
+        // Initialize Kaboom
+        kaboom({
+            width: 1000,
+            height: 600,
+            background: [20, 20, 40],
+            parent: document.querySelector("#game-container"),
+        });
+
+        // ============================================
+        // LOAD SPRITES
+        // ============================================
+        loadSprite("arianne", "assets/sprites/arianne.jpeg");
+        loadSprite("bogdan", "assets/sprites/bogdan.jpeg");
+        loadSprite("caroline", "assets/sprites/caroline.jpeg");
+        loadSprite("dishant", "assets/sprites/dishant.jpeg");
+        loadSprite("iustina", "assets/sprites/iustina.png");
+        loadSprite("kateryna", "assets/sprites/kateryna.jpeg");
+        loadSprite("kunal", "assets/sprites/kunal.jpeg");
+        loadSprite("maksym", "assets/sprites/maksym.jpeg");
+        loadSprite("petrica", "assets/sprites/petrica.jpeg");
+        loadSprite("richard", "assets/sprites/richard.jpeg");
+        loadSprite("thong", "assets/sprites/thong.jpeg");
+
+        // ============================================
+        // MAIN GAME SCENE
+        // ============================================
+        scene("main", () => {
+            // Title
+            add([
+                text("Visual Hive: Quest for Series A", { size: 32 }),
+                pos(width() / 2, 40),
+                anchor("center"),
+                color(255, 215, 0),
+            ]);
+
+            // Subtitle
+            add([
+                text("Click on team members to use their abilities!", { size: 16 }),
+                pos(width() / 2, 80),
+                anchor("center"),
+                color(200, 200, 200),
+            ]);
+
+            // Progress bar background
+            add([
+                rect(400, 30),
+                pos(width() / 2 - 200, 120),
+                color(60, 60, 80),
+                outline(2, [100, 100, 120]),
+            ]);
+
+            // Progress bar fill
+            const progressBar = add([
+                rect(0, 26),
+                pos(width() / 2 - 198, 122),
+                color(100, 200, 100),
+                { progress: 0 },
+            ]);
+
+            // Progress text
+            add([
+                text("Series A Progress: 0%", { size: 14 }),
+                pos(width() / 2, 135),
+                anchor("center"),
+                color(255, 255, 255),
+                "progressText",
+            ]);
+
+            // ============================================
+            // CHARACTER DEFINITIONS
+            // ============================================
+            // All 11 Visual Hive team members arranged in 3 rows
+            
+            const characters = [
+                // TOP ROW - LEADERSHIP
+                {
+                    name: "Bogdan",
+                    role: "CEO & Founder",
+                    color: [255, 100, 100],
+                    pos: [250, 200],
+                    ability: "Charm Offensive",
+                    emoji: "🤝",
+                    progressBoost: 15,
+                    description: "Way too nice, honest businessman"
+                },
+                {
+                    name: "Petrica",
+                    role: "COO & Cofounder",
+                    color: [75, 75, 150],
+                    pos: [500, 200],
+                    ability: "Reality Check Shield",
+                    emoji: "🛡️",
+                    progressBoost: 10,
+                    description: "The hard-ass, moving to France, loves wine"
+                },
+                {
+                    name: "Richard",
+                    role: "CTO",
+                    color: [100, 150, 255],
+                    pos: [750, 200],
+                    ability: "Tech Innovation Burst",
+                    emoji: "💻",
+                    progressBoost: 12,
+                    description: "Lifetime geek, loves experimenting"
+                },
+                
+                // MIDDLE ROW - CORE TEAM
+                {
+                    name: "Dishant",
+                    role: "Lead Developer",
+                    color: [100, 180, 100],
+                    pos: [200, 320],
+                    ability: "Code Perfection",
+                    emoji: "🏔️",
+                    progressBoost: 13,
+                    description: "Loves hiking, heart of gold"
+                },
+                {
+                    name: "Thong",
+                    role: "Programmer",
+                    color: [150, 255, 100],
+                    pos: [400, 320],
+                    ability: "Lightning Code + Real Energy",
+                    emoji: "⚡",
+                    progressBoost: 14,
+                    description: "Speed of light, says 'Real!'"
+                },
+                {
+                    name: "Caroline",
+                    role: "Product Owner",
+                    color: [180, 100, 200],
+                    pos: [600, 320],
+                    ability: "Perfect Prompt Engineering",
+                    emoji: "✨",
+                    progressBoost: 11,
+                    description: "Richard's wife, prompt specialist"
+                },
+                {
+                    name: "Kunal",
+                    role: "Sales",
+                    color: [255, 140, 50],
+                    pos: [800, 320],
+                    ability: "Omnipresent Sales Force",
+                    emoji: "🥃",
+                    progressBoost: 13,
+                    description: "Omnipresent, loves whiskey"
+                },
+                
+                // BOTTOM ROW - SUPPORT & SPECIALISTS
+                {
+                    name: "Kateryna",
+                    role: "DevOps",
+                    color: [150, 50, 100],
+                    pos: [200, 440],
+                    ability: "Vampire Mode Deployment",
+                    emoji: "🦇",
+                    progressBoost: 12,
+                    description: "Works nights, loves metal music"
+                },
+                {
+                    name: "Maksym",
+                    role: "DevOps",
+                    color: [50, 200, 255],
+                    pos: [400, 440],
+                    ability: "Young Genius Support",
+                    emoji: "🧠",
+                    progressBoost: 10,
+                    description: "19yo genius, incredibly helpful"
+                },
+                {
+                    name: "Arianne",
+                    role: "Junior Frontend Dev",
+                    color: [255, 150, 150],
+                    pos: [600, 440],
+                    ability: "Learning Boost",
+                    emoji: "🌱",
+                    progressBoost: 8,
+                    description: "Full of potential, growing stronger",
+                    growthCount: 0
+                },
+                {
+                    name: "Iustina",
+                    role: "Project Manager",
+                    color: [120, 120, 120],
+                    pos: [800, 440],
+                    ability: "Mystery Agent Coordination",
+                    emoji: "🕵️",
+                    progressBoost: 10,
+                    description: "Mystery person, camera always off"
+                }
+            ];
+
+            // ============================================
+            // GAME STATE VARIABLES FOR SPECIAL MECHANICS
+            // ============================================
+            let gameStartTime = time();
+            let nextCharacterBoosted = false;
+            let recentClickTimes = [];
+            let nightModeActive = false;
+            
+            // ============================================
+            // RANDOM EVENTS SYSTEM
+            // ============================================
+            let lastEventTime = 0;
+            let eventCooldown = false;
+            let investorCallActive = false;
+            let coffeeBreakActive = false;
+            let coffeeBreakEndTime = 0;
+            
+            const events = [
+                {
+                    name: "Bug in Production!",
+                    probability: 0.3,
+                    effect: () => {
+                        // Lose 5% progress
+                        progressBar.progress = Math.max(0, progressBar.progress - 5);
+                        progressBar.width = (progressBar.progress / 100) * 396;
+                        
+                        // Update progress text
+                        const progressTexts = get("progressText");
+                        progressTexts.forEach(t => {
+                            t.text = `Series A Progress: ${Math.floor(progressBar.progress)}%`;
+                        });
+                        
+                        // Show dramatic effect
+                        const bugText = add([
+                            text("🐛 BUG IN PRODUCTION! 🐛", { size: 24 }),
+                            pos(width() / 2, height() / 2 - 50),
+                            anchor("center"),
+                            color(255, 50, 50),
+                            lifespan(3),
+                        ]);
+                        
+                        const lossText = add([
+                            text("-5% Progress!", { size: 18 }),
+                            pos(width() / 2, height() / 2 - 20),
+                            anchor("center"),
+                            color(255, 100, 100),
+                            lifespan(3),
+                        ]);
+                        
+                        // Screen shake effect
+                        camShake(8);
+                        
+                        // Animate text
+                        bugText.onUpdate(() => {
+                            bugText.opacity -= 0.01;
+                        });
+                        lossText.onUpdate(() => {
+                            lossText.opacity -= 0.01;
+                        });
+                    }
+                },
+                {
+                    name: "Investor Call!",
+                    probability: 0.25,
+                    effect: () => {
+                        investorCallActive = true;
+                        
+                        const callText = add([
+                            text("📞 INVESTOR CALL! 📞", { size: 24 }),
+                            pos(width() / 2, height() / 2 - 50),
+                            anchor("center"),
+                            color(255, 215, 0),
+                            lifespan(3),
+                        ]);
+                        
+                        const bonusText = add([
+                            text("Use Bogdan next for MEGA bonus!", { size: 16 }),
+                            pos(width() / 2, height() / 2 - 20),
+                            anchor("center"),
+                            color(255, 255, 100),
+                            lifespan(3),
+                        ]);
+                        
+                        // Animate text
+                        callText.onUpdate(() => {
+                            callText.opacity -= 0.01;
+                        });
+                        bonusText.onUpdate(() => {
+                            bonusText.opacity -= 0.01;
+                        });
+                        
+                        // Highlight Bogdan
+                        const bogdanChars = get().filter(obj => obj.charData && obj.charData.name === "Bogdan");
+                        bogdanChars.forEach(bogdanObj => {
+                            const glow = add([
+                                circle(bogdanObj.radius + 10),
+                                pos(bogdanObj.pos),
+                                color(255, 215, 0),
+                                opacity(0.3),
+                                anchor("center"),
+                                lifespan(8),
+                                { pulseTimer: 0 }
+                            ]);
+                            
+                            glow.onUpdate(() => {
+                                glow.pulseTimer += dt();
+                                glow.opacity = 0.2 + Math.sin(glow.pulseTimer * 6) * 0.15;
+                            });
+                        });
+                    }
+                },
+                {
+                    name: "Demo Day!",
+                    probability: 0.25,
+                    effect: () => {
+                        const recentClicks = recentClickTimes.filter(t => time() - t <= 10).length;
+                        const bonus = recentClicks * 2; // 2% per recent click
+                        
+                        if (bonus > 0) {
+                            progressBar.progress += bonus;
+                            if (progressBar.progress > 100) progressBar.progress = 100;
+                            progressBar.width = (progressBar.progress / 100) * 396;
+                            
+                            // Update progress text
+                            const progressTexts = get("progressText");
+                            progressTexts.forEach(t => {
+                                t.text = `Series A Progress: ${Math.floor(progressBar.progress)}%`;
+                            });
+                        }
+                        
+                        const demoText = add([
+                            text("🎯 DEMO DAY! 🎯", { size: 24 }),
+                            pos(width() / 2, height() / 2 - 50),
+                            anchor("center"),
+                            color(100, 255, 100),
+                            lifespan(3),
+                        ]);
+                        
+                        const resultText = add([
+                            text(bonus > 0 ? `Team synergy! +${bonus}%` : "Need more teamwork!", { size: 16 }),
+                            pos(width() / 2, height() / 2 - 20),
+                            anchor("center"),
+                            color(bonus > 0 ? [150, 255, 150] : [255, 200, 100]),
+                            lifespan(3),
+                        ]);
+                        
+                        // Animate text
+                        demoText.onUpdate(() => {
+                            demoText.opacity -= 0.01;
+                        });
+                        resultText.onUpdate(() => {
+                            resultText.opacity -= 0.01;
+                        });
+                    }
+                },
+                {
+                    name: "Coffee Break",
+                    probability: 0.2,
+                    effect: () => {
+                        coffeeBreakActive = true;
+                        coffeeBreakEndTime = time() + 10;
+                        
+                        const coffeeText = add([
+                            text("☕ COFFEE BREAK! ☕", { size: 24 }),
+                            pos(width() / 2, height() / 2 - 50),
+                            anchor("center"),
+                            color(139, 69, 19),
+                            lifespan(3),
+                        ]);
+                        
+                        const speedText = add([
+                            text("All cooldowns halved for 10 seconds!", { size: 16 }),
+                            pos(width() / 2, height() / 2 - 20),
+                            anchor("center"),
+                            color(205, 133, 63),
+                            lifespan(3),
+                        ]);
+                        
+                        // Coffee break indicator
+                        const indicator = add([
+                            text("☕ COFFEE BREAK ACTIVE", { size: 14 }),
+                            pos(width() / 2, 180),
+                            anchor("center"),
+                            color(139, 69, 19),
+                            "coffeeIndicator"
+                        ]);
+                        
+                        // Animate text
+                        coffeeText.onUpdate(() => {
+                            coffeeText.opacity -= 0.01;
+                        });
+                        speedText.onUpdate(() => {
+                            speedText.opacity -= 0.01;
+                        });
+                    }
+                }
+            ];
+            
+            // Random event trigger
+            function triggerRandomEvent() {
+                if (eventCooldown) return;
+                
+                const totalProbability = events.reduce((sum, event) => sum + event.probability, 0);
+                let random = Math.random() * totalProbability;
+                
+                for (const event of events) {
+                    random -= event.probability;
+                    if (random <= 0) {
+                        event.effect();
+                        break;
+                    }
+                }
+                
+                eventCooldown = true;
+                wait(rand(15, 30), () => {
+                    eventCooldown = false;
+                });
+            }
+
+            // Night mode indicator (initially hidden)
+            const nightModeIndicator = add([
+                text("🌙 NIGHT MODE ACTIVE", { size: 16 }),
+                pos(width() / 2, 160),
+                anchor("center"),
+                color(150, 100, 255),
+                "nightIndicator"
+            ]);
+            nightModeIndicator.opacity = 0; // Set opacity after creation
+
+            // Update game systems
+            onUpdate(() => {
+                const gameTime = time() - gameStartTime;
+                
+                // Night mode activation
+                if (gameTime >= 30 && !nightModeActive) {
+                    nightModeActive = true;
+                    
+                    // Show night mode activation
+                    nightModeIndicator.opacity = 1;
+                    
+                    // Flash effect for Kateryna when night mode activates
+                    const katerynaChars = get().filter(obj => obj.charData && obj.charData.name === "Kateryna");
+                    katerynaChars.forEach(katObj => {
+                        // Flash effect
+                        tween(katObj.opacity, 0.3, 0.2, (val) => katObj.opacity = val, easings.easeInOut);
+                        wait(0.2, () => {
+                            tween(katObj.opacity, 1, 0.2, (val) => katObj.opacity = val, easings.easeInOut);
+                        });
+                    });
+                    
+                        // Show night mode activation message
+                        const nightText = add([
+                            text("Night Mode Activated! Kateryna is stronger!", { size: 18 }),
+                            pos(width() / 2, height() / 2),
+                            anchor("center"),
+                            color(150, 100, 255),
+                            lifespan(3),
+                        ]);
+                    nightText.onUpdate(() => {
+                        nightText.opacity -= 0.01;
+                    });
+                }
+                
+                // Random event triggering (15-30 second intervals)
+                if (gameTime >= 10 && !eventCooldown) { // Start events after 10 seconds
+                    triggerRandomEvent();
+                }
+                
+                // Coffee break status check
+                if (coffeeBreakActive && time() >= coffeeBreakEndTime) {
+                    coffeeBreakActive = false;
+                    // Remove coffee indicator
+                    const indicators = get("coffeeIndicator");
+                    indicators.forEach(indicator => indicator.destroy());
+                }
+                
+                // Progress bar color transitions
+                const progress = progressBar.progress;
+                if (progress >= 80) {
+                    progressBar.color = rgb(255, 215, 0); // Gold
+                } else if (progress >= 50) {
+                    progressBar.color = rgb(255, 255, 100); // Yellow
+                } else {
+                    progressBar.color = rgb(100, 200, 100); // Green
+                }
+            });
+            
+            // ============================================
+            // PARTICLE SYSTEM
+            // ============================================
+            function createParticleEffect(x, y, color, count = 8) {
+                for (let i = 0; i < count; i++) {
+                    const particle = add([
+                        circle(rand(2, 4)),
+                        pos(x, y),
+                        color(color[0], color[1], color[2]),
+                        opacity(1),
+                        lifespan(1),
+                        {
+                            vel: {
+                                x: rand(-100, 100),
+                                y: rand(-150, -50)
+                            },
+                            gravity: 200
+                        }
+                    ]);
+                    
+                    particle.onUpdate(() => {
+                        particle.pos.x += particle.vel.x * dt();
+                        particle.pos.y += particle.vel.y * dt();
+                        particle.vel.y += particle.gravity * dt();
+                        particle.opacity -= dt() * 1.5;
+                    });
+                }
+            }
+            
+            function createHeartParticles(x1, y1, x2, y2) {
+                const heartCount = 5;
+                for (let i = 0; i < heartCount; i++) {
+                    const progress = i / (heartCount - 1);
+                    const heartX = x1 + (x2 - x1) * progress;
+                    const heartY = y1 + (y2 - y1) * progress + Math.sin(progress * Math.PI) * -20;
+                    
+                    const heart = add([
+                        text("💕", { size: 16 }),
+                        pos(heartX, heartY),
+                        opacity(0.8),
+                        lifespan(2),
+                        { floatSpeed: rand(20, 40) }
+                    ]);
+                    
+                    heart.onUpdate(() => {
+                        heart.pos.y -= heart.floatSpeed * dt();
+                        heart.opacity -= dt() * 0.5;
+                    });
+                }
+            }
+
+            // ============================================
+            // CREATE CHARACTERS
+            // ============================================
+            characters.forEach(char => {
+                // Character circle (special handling for special characters)
+                const baseRadius = 40;
+                const baseColor = [char.color[0], char.color[1], char.color[2]];
+                
+                // Calculate Arianne's growth effects
+                let radius = baseRadius;
+                let circleColor = baseColor;
+                let opacity = 1;
+                
+                if (char.name === "Arianne") {
+                    const growthBonus = char.growthCount || 0;
+                    radius = baseRadius + (growthBonus * 2); // Grows by 2px per use
+                    // Increase brightness with each use
+                    circleColor = [
+                        Math.min(255, baseColor[0] + (growthBonus * 10)),
+                        Math.min(255, baseColor[1] + (growthBonus * 8)),
+                        Math.min(255, baseColor[2] + (growthBonus * 8))
+                    ];
+                }
+                
+                // Easter egg: Iustina appears shadowy/mysterious
+                if (char.name === "Iustina") {
+                    opacity = 0.7; // Semi-transparent
+                    circleColor = [80, 80, 80]; // Darker, more mysterious
+                }
+                
+                const charObj = add([
+                    circle(radius),
+                    pos(char.pos[0], char.pos[1]),
+                    color(circleColor[0], circleColor[1], circleColor[2]),
+                    area(),
+                    anchor("center"),
+                    outline(3, [255, 255, 255]),
+                    {
+                        charData: char,
+                        cooldown: false,
+                        baseRadius: baseRadius,
+                        baseColor: baseColor
+                    }
+                ]);
+
+                // Character sprite (photo)
+                const spriteKey = char.name.toLowerCase();
+                add([
+                    sprite(spriteKey),
+                    pos(char.pos[0], char.pos[1]),
+                    anchor("center"),
+                    scale(0.3), // Scale down the photos to fit nicely in the circle
+                ]);
+
+                // Add emoji as a small overlay for ability identification
+                add([
+                    text(char.emoji, { size: 16 }),
+                    pos(char.pos[0] + 25, char.pos[1] - 25),
+                    anchor("center"),
+                    outline(2, [0, 0, 0]),
+                ]);
+
+                // Name label
+                add([
+                    text(char.name, { size: 16 }),
+                    pos(char.pos[0], char.pos[1] + 60),
+                    anchor("center"),
+                    color(255, 255, 255),
+                ]);
+
+                // Role label
+                add([
+                    text(char.role, { size: 12 }),
+                    pos(char.pos[0], char.pos[1] + 80),
+                    anchor("center"),
+                    color(180, 180, 180),
+                ]);
+
+                // ============================================
+                // CLICK INTERACTION
+                // ============================================
+                charObj.onClick(() => {
+                    if (charObj.cooldown) return;
+
+                    // Track click time for synergy mechanics
+                    recentClickTimes.push(time());
+                    // Keep only clicks from last 10 seconds for demo day
+                    recentClickTimes = recentClickTimes.filter(t => time() - t <= 10);
+
+                    // Create particle effect when clicked
+                    createParticleEffect(char.pos[0], char.pos[1], char.color);
+
+                    // Check if character is boosted by Maksym
+                    let isCharacterBoosted = nextCharacterBoosted && char.name !== "Maksym";
+                    if (isCharacterBoosted) {
+                        nextCharacterBoosted = false; // Reset boost after use
+                    }
+
+                    // Visual feedback - scale up
+                    charObj.scale = 1.2;
+                    wait(0.2, () => {
+                        charObj.scale = 1;
+                    });
+
+                    // Show ability used
+                    const abilityText = add([
+                        text(`${char.ability}!`, { size: 18 }),
+                        pos(char.pos[0], char.pos[1] - 80),
+                        anchor("center"),
+                        color(255, 215, 0),
+                        opacity(1),
+                        lifespan(1.5),
+                    ]);
+
+                    // Float up animation
+                    abilityText.onUpdate(() => {
+                        abilityText.pos.y -= 1;
+                        abilityText.opacity -= 0.02;
+                    });
+
+                    // Calculate base boost
+                    let actualBoost = char.progressBoost;
+                    
+                    // Special event: Investor Call bonus for Bogdan
+                    if (char.name === "Bogdan" && investorCallActive) {
+                        actualBoost = Math.round(actualBoost * 2); // Double boost!
+                        investorCallActive = false; // Use up the bonus
+                        
+                        // Show mega bonus
+                        const megaText = add([
+                            text("MEGA CHARM BONUS! (+100%)", { size: 16 }),
+                            pos(char.pos[0], char.pos[1] + 100),
+                            anchor("center"),
+                            color(255, 215, 0),
+                            opacity(1),
+                            lifespan(2),
+                        ]);
+                        megaText.onUpdate(() => {
+                            megaText.opacity -= 0.015;
+                        });
+                        
+                        // Extra particle burst
+                        createParticleEffect(char.pos[0], char.pos[1], [255, 215, 0], 15);
+                    }
+                    
+                    // Special mechanic: Maksym's support boost
+                    if (char.name === "Maksym") {
+                        nextCharacterBoosted = true;
+                        
+                        // Show boost setup message
+                        const boostText = add([
+                            text("Next character boosted!", { size: 14 }),
+                            pos(char.pos[0], char.pos[1] + 100),
+                            anchor("center"),
+                            color(50, 200, 255),
+                            opacity(1),
+                            lifespan(1.5),
+                        ]);
+                        boostText.onUpdate(() => {
+                            boostText.opacity -= 0.02;
+                        });
+                    }
+                    
+                    // Apply Maksym's 20% boost to other characters
+                    if (isCharacterBoosted) {
+                        actualBoost = Math.round(actualBoost * 1.2);
+                        
+                        // Show boosted indicator
+                        const boostedText = add([
+                            text("BOOSTED! (+20%)", { size: 14 }),
+                            pos(char.pos[0], char.pos[1] + 100),
+                            anchor("center"),
+                            color(255, 255, 50),
+                            opacity(1),
+                            lifespan(1.5),
+                        ]);
+                        boostedText.onUpdate(() => {
+                            boostedText.opacity -= 0.02;
+                        });
+                    }
+                    
+                    // Special mechanic: Kunal's synergy multiplier
+                    if (char.name === "Kunal" && recentClickTimes.length >= 2) {
+                        actualBoost = Math.round(actualBoost * 1.05); // 5% bonus
+                        
+                        // Show synergy message
+                        const synergyText = add([
+                            text("Sales Synergy! (+5%)", { size: 14 }),
+                            pos(char.pos[0], char.pos[1] + 100),
+                            anchor("center"),
+                            color(255, 200, 50),
+                            opacity(1),
+                            lifespan(1.5),
+                        ]);
+                        synergyText.onUpdate(() => {
+                            synergyText.opacity -= 0.02;
+                        });
+                    }
+                    
+                    // Special mechanic: Kateryna's night mode boost
+                    if (char.name === "Kateryna" && nightModeActive) {
+                        actualBoost = Math.round(actualBoost * 1.5); // 50% stronger at night
+                        
+                        // Show vampire mode message
+                        const vampireText = add([
+                            text("Vampire Mode! (+50%)", { size: 14 }),
+                            pos(char.pos[0], char.pos[1] + 100),
+                            anchor("center"),
+                            color(150, 100, 255),
+                            opacity(1),
+                            lifespan(1.5),
+                        ]);
+                        vampireText.onUpdate(() => {
+                            vampireText.opacity -= 0.02;
+                        });
+                    }
+                    
+                    // Special mechanic: Arianne's growing power
+                    if (char.name === "Arianne") {
+                        char.growthCount = (char.growthCount || 0) + 1;
+                        actualBoost = char.progressBoost + char.growthCount;
+                        
+                        // Update visual appearance - grow size and brightness
+                        const newRadius = charObj.baseRadius + (char.growthCount * 2);
+                        const newColor = [
+                            Math.min(255, charObj.baseColor[0] + (char.growthCount * 10)),
+                            Math.min(255, charObj.baseColor[1] + (char.growthCount * 8)),
+                            Math.min(255, charObj.baseColor[2] + (char.growthCount * 8))
+                        ];
+                        charObj.radius = newRadius;
+                        charObj.color = rgb(newColor[0], newColor[1], newColor[2]);
+                        
+                        // Show growth indicator
+                        const growthText = add([
+                            text(`Growing! (+${char.growthCount})`, { size: 12 }),
+                            pos(char.pos[0], char.pos[1] + 120),
+                            anchor("center"),
+                            color(255, 200, 255),
+                            opacity(1),
+                            lifespan(1.5),
+                        ]);
+                        growthText.onUpdate(() => {
+                            growthText.opacity -= 0.02;
+                        });
+                    }
+
+                    // Show progress gain (with actual boost for Arianne)
+                    const progressGain = add([
+                        text(`+${actualBoost}%`, { size: 16 }),
+                        pos(char.pos[0] + 50, char.pos[1] - 50),
+                        anchor("center"),
+                        color(100, 255, 100),
+                        opacity(1),
+                        lifespan(1),
+                    ]);
+
+                    progressGain.onUpdate(() => {
+                        progressGain.pos.y -= 2;
+                        progressGain.opacity -= 0.03;
+                    });
+
+                    // Easter egg: Thong says "Real!"
+                    if (char.name === "Thong" && Math.random() > 0.5) {
+                        const realText = add([
+                            text("Real!", { size: 14 }),
+                            pos(char.pos[0], char.pos[1] + 100),
+                            anchor("center"),
+                            color(150, 255, 100),
+                            opacity(1),
+                            lifespan(1.2),
+                        ]);
+                        realText.onUpdate(() => {
+                            realText.opacity -= 0.025;
+                        });
+                    }
+                    
+                    // Easter egg: Petrica shows French symbols occasionally
+                    if (char.name === "Petrica" && Math.random() > 0.7) {
+                        const frenchSymbols = ["🍷", "🥖"];
+                        const symbol = frenchSymbols[Math.floor(Math.random() * frenchSymbols.length)];
+                        const frenchText = add([
+                            text(symbol, { size: 20 }),
+                            pos(char.pos[0] - 60, char.pos[1] - 30),
+                            anchor("center"),
+                            opacity(1),
+                            lifespan(1.5),
+                        ]);
+                        frenchText.onUpdate(() => {
+                            frenchText.opacity -= 0.02;
+                        });
+                    }
+
+                    // Update progress
+                    progressBar.progress += actualBoost;
+                    if (progressBar.progress > 100) progressBar.progress = 100;
+                    
+                    progressBar.width = (progressBar.progress / 100) * 396;
+
+                    // Update progress text
+                    const progressTexts = get("progressText");
+                    progressTexts.forEach(t => {
+                        t.text = `Series A Progress: ${Math.floor(progressBar.progress)}%`;
+                    });
+
+                    // Check win condition
+                    if (progressBar.progress >= 100) {
+                        wait(0.5, () => {
+                            go("victory");
+                        });
+                    }
+
+                    // Personality touches: Richard & Caroline interaction
+                    if (char.name === "Richard" || char.name === "Caroline") {
+                        const partnerName = char.name === "Richard" ? "Caroline" : "Richard";
+                        const partnerChars = get().filter(obj => obj.charData && obj.charData.name === partnerName);
+                        
+                        if (partnerChars.length > 0 && Math.random() > 0.6) {
+                            const partner = partnerChars[0];
+                            createHeartParticles(char.pos[0], char.pos[1], partner.pos.x, partner.pos.y);
+                            
+                            const loveText = add([
+                                text("💕 Power Couple! 💕", { size: 12 }),
+                                pos((char.pos[0] + partner.pos.x) / 2, (char.pos[1] + partner.pos.y) / 2),
+                                anchor("center"),
+                                color(255, 192, 203),
+                                opacity(1),
+                                lifespan(2),
+                            ]);
+                            loveText.onUpdate(() => {
+                                loveText.opacity -= 0.015;
+                            });
+                        }
+                    }
+                    
+                    // Kunal's omnipresence: appears near other characters when they're clicked
+                    if (char.name !== "Kunal" && Math.random() > 0.7) {
+                        const kunalEmoji = add([
+                            text("🥃", { size: 20 }),
+                            pos(char.pos[0] + rand(-80, 80), char.pos[1] + rand(-60, 60)),
+                            opacity(0.8),
+                            lifespan(1.5),
+                            { floatSpeed: rand(15, 25) }
+                        ]);
+                        
+                        kunalEmoji.onUpdate(() => {
+                            kunalEmoji.pos.y -= kunalEmoji.floatSpeed * dt();
+                            kunalEmoji.opacity -= dt() * 0.6;
+                        });
+                        
+                        // Whiskey glass particle effect
+                        if (Math.random() > 0.8) {
+                            const whiskey = add([
+                                text("🥃", { size: 12 }),
+                                pos(kunalEmoji.pos.x, kunalEmoji.pos.y),
+                                opacity(0.6),
+                                lifespan(1),
+                                {
+                                    vel: { x: rand(-30, 30), y: rand(-50, -20) }
+                                }
+                            ]);
+                            
+                            whiskey.onUpdate(() => {
+                                whiskey.pos.x += whiskey.vel.x * dt();
+                                whiskey.pos.y += whiskey.vel.y * dt();
+                                whiskey.opacity -= dt() * 1.2;
+                            });
+                        }
+                    }
+
+                    // Set cooldown (halved during coffee break)
+                    charObj.cooldown = true;
+                    const cooldownTime = coffeeBreakActive ? 0.75 : 1.5; // Half cooldown during coffee break
+                    wait(cooldownTime, () => {
+                        charObj.cooldown = false;
+                    });
+                });
+
+                // Add glow effect for available characters
+                const glowObj = add([
+                    circle(radius + 8),
+                    pos(char.pos[0], char.pos[1]),
+                    color(char.color[0], char.color[1], char.color[2]),
+                    opacity(0),
+                    anchor("center"),
+                    {
+                        pulseTimer: 0,
+                        charName: char.name
+                    }
+                ]);
+
+                glowObj.onUpdate(() => {
+                    if (!charObj.cooldown) {
+                        glowObj.pulseTimer += dt();
+                        glowObj.opacity = 0.1 + Math.sin(glowObj.pulseTimer * 3) * 0.08;
+                    } else {
+                        glowObj.opacity = 0;
+                    }
+                });
+
+                // Hover tooltip system
+                let tooltip = null;
+
+                // Hover effect with tooltip
+                charObj.onHoverUpdate(() => {
+                    if (!charObj.cooldown) {
+                        charObj.scale = 1.1;
+                        glowObj.opacity = 0.3;
+                    }
+
+                    // Show tooltip
+                    if (!tooltip) {
+                        // Calculate tooltip position (above character, but adjust if too close to edges)
+                        let tooltipX = char.pos[0];
+                        let tooltipY = char.pos[1] - 120;
+                        
+                        // Adjust if too close to top
+                        if (tooltipY < 50) {
+                            tooltipY = char.pos[1] + 140;
+                        }
+                        
+                        // Create tooltip background
+                        const tooltipBg = add([
+                            rect(220, 60),
+                            pos(tooltipX, tooltipY),
+                            anchor("center"),
+                            color(0, 0, 0),
+                            opacity(0.8),
+                            outline(2, [255, 255, 255]),
+                            "tooltip"
+                        ]);
+
+                        // Character description text
+                        const descText = add([
+                            text(char.description, { size: 12 }),
+                            pos(tooltipX, tooltipY - 10),
+                            anchor("center"),
+                            color(255, 255, 255),
+                            "tooltip"
+                        ]);
+
+                        // Ability info
+                        const abilityInfo = add([
+                            text(`${char.ability} (+${char.progressBoost}%)`, { size: 10 }),
+                            pos(tooltipX, tooltipY + 10),
+                            anchor("center"),
+                            color(255, 215, 0),
+                            "tooltip"
+                        ]);
+
+                        tooltip = { bg: tooltipBg, desc: descText, ability: abilityInfo };
+                    }
+                });
+
+                charObj.onHoverEnd(() => {
+                    if (!charObj.cooldown) {
+                        charObj.scale = 1;
+                        glowObj.opacity = 0.1 + Math.sin(glowObj.pulseTimer * 3) * 0.08;
+                    }
+
+                    // Remove tooltip
+                    if (tooltip) {
+                        tooltip.bg.destroy();
+                        tooltip.desc.destroy();
+                        tooltip.ability.destroy();
+                        tooltip = null;
+                    }
+                });
+            });
+
+            // Instructions at bottom
+            add([
+                text("Click team members to use their special abilities and secure Series A funding!", { size: 14 }),
+                pos(width() / 2, height() - 40),
+                anchor("center"),
+                color(150, 150, 150),
+            ]);
+
+            // Dev note
+            add([
+                text("✨ ALL SPECIAL MECHANICS IMPLEMENTED! ✨ Arianne grows • Maksym boosts • Kunal synergizes • Kateryna vampires • Easter eggs!", { size: 10 }),
+                pos(width() / 2, height() - 20),
+                anchor("center"),
+                color(100, 255, 100),
+            ]);
+        });
+
+        // ============================================
+        // VICTORY SCENE
+        // ============================================
+        scene("victory", () => {
+            // Screen shake for dramatic effect
+            camShake(12);
+            
+            // Victory title with bounce animation
+            const victoryTitle = add([
+                text("🎉 SERIES A SECURED! 🎉", { size: 48 }),
+                pos(width() / 2, height() / 2 - 80),
+                anchor("center"),
+                color(255, 215, 0),
+                scale(0.5),
+            ]);
+            
+            // Animate title entrance
+            tween(victoryTitle.scale, 1.2, 0.5, (val) => victoryTitle.scale = val, easings.easeOutElastic);
+            wait(0.5, () => {
+                tween(victoryTitle.scale, 1, 0.3, (val) => victoryTitle.scale = val, easings.easeOutBounce);
+            });
+
+            // Success message with delay
+            wait(0.8, () => {
+                const successMsg = add([
+                    text("Visual Hive is ready to grow!", { size: 24 }),
+                    pos(width() / 2, height() / 2 - 20),
+                    anchor("center"),
+                    color(100, 200, 100),
+                    opacity(0),
+                ]);
+                
+                tween(successMsg.opacity, 1, 0.8, (val) => successMsg.opacity = val, easings.easeOutQuad);
+            });
+
+            // Celebration message with delay
+            wait(1.5, () => {
+                const celebrationMsg = add([
+                    text("The team worked together perfectly!", { size: 18 }),
+                    pos(width() / 2, height() / 2 + 20),
+                    anchor("center"),
+                    color(200, 200, 255),
+                    opacity(0),
+                ]);
+                
+                tween(celebrationMsg.opacity, 1, 0.8, (val) => celebrationMsg.opacity = val, easings.easeOutQuad);
+            });
+
+            // Play again prompt with delay
+            wait(2.5, () => {
+                const playAgainMsg = add([
+                    text("Click anywhere to play again", { size: 16 }),
+                    pos(width() / 2, height() / 2 + 80),
+                    anchor("center"),
+                    color(150, 150, 150),
+                    opacity(0),
+                ]);
+                
+                tween(playAgainMsg.opacity, 1, 1, (val) => playAgainMsg.opacity = val, easings.easeOutQuad);
+            });
+
+            // Click to restart
+            onClick(() => {
+                go("main");
+            });
+
+            // Enhanced confetti system with varied shapes and colors
+            const confettiShapes = ["🎊", "⭐", "✨", "💫", "🌟"];
+            const confettiColors = [
+                [255, 215, 0], // Gold
+                [255, 100, 100], // Red
+                [100, 255, 100], // Green
+                [100, 150, 255], // Blue
+                [255, 100, 255], // Magenta
+                [255, 165, 0] // Orange
+            ];
+
+            // Multiple waves of confetti
+            for (let wave = 0; wave < 3; wave++) {
+                wait(wave * 0.5, () => {
+                    // Emoji confetti from top
+                    for (let i = 0; i < 15; i++) {
+                        wait(i * 0.1, () => {
+                            const confettiEmoji = add([
+                                text(confettiShapes[Math.floor(Math.random() * confettiShapes.length)], { size: rand(16, 24) }),
+                                pos(rand(0, width()), -30),
+                                rotate(rand(0, 360)),
+                                lifespan(4),
+                                {
+                                    vel: { x: rand(-50, 50), y: rand(100, 200) },
+                                    rotSpeed: rand(-200, 200)
+                                }
+                            ]);
+
+                            confettiEmoji.onUpdate(() => {
+                                confettiEmoji.pos.x += confettiEmoji.vel.x * dt();
+                                confettiEmoji.pos.y += confettiEmoji.vel.y * dt();
+                                confettiEmoji.angle += confettiEmoji.rotSpeed * dt();
+                                confettiEmoji.vel.y += 150 * dt(); // Gravity
+                            });
+                        });
+                    }
+                    
+                    // Geometric confetti
+                    for (let i = 0; i < 20; i++) {
+                        wait(i * 0.05, () => {
+                            const color = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+                            const shapes = [
+                                () => rect(rand(8, 16), rand(8, 16)),
+                                () => circle(rand(4, 8)),
+                                () => rect(rand(12, 20), rand(2, 4))
+                            ];
+                            
+                            const confetti = add([
+                                shapes[Math.floor(Math.random() * shapes.length)](),
+                                pos(rand(0, width()), -20),
+                                color(color[0], color[1], color[2]),
+                                rotate(rand(0, 360)),
+                                opacity(rand(0.7, 1)),
+                                lifespan(4),
+                                {
+                                    vel: { x: rand(-100, 100), y: rand(50, 150) },
+                                    rotSpeed: rand(-300, 300)
+                                }
+                            ]);
+
+                            confetti.onUpdate(() => {
+                                confetti.pos.x += confetti.vel.x * dt();
+                                confetti.pos.y += confetti.vel.y * dt();
+                                confetti.angle += confetti.rotSpeed * dt();
+                                confetti.vel.y += 200 * dt(); // Gravity
+                                confetti.opacity -= dt() * 0.3;
+                            });
+                        });
+                    }
+                });
+            }
+            
+            // Fireworks effect
+            for (let i = 0; i < 5; i++) {
+                wait(i * 0.8, () => {
+                    const fireworkX = rand(100, width() - 100);
+                    const fireworkY = rand(100, height() / 2);
+                    
+                    // Firework burst
+                    for (let j = 0; j < 12; j++) {
+                        const angle = (j / 12) * Math.PI * 2;
+                        const speed = rand(100, 200);
+                        const color = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+                        
+                        const spark = add([
+                            circle(rand(3, 6)),
+                            pos(fireworkX, fireworkY),
+                            color(color[0], color[1], color[2]),
+                            opacity(1),
+                            lifespan(2),
+                            {
+                                vel: {
+                                    x: Math.cos(angle) * speed,
+                                    y: Math.sin(angle) * speed
+                                }
+                            }
+                        ]);
+                        
+                        spark.onUpdate(() => {
+                            spark.pos.x += spark.vel.x * dt();
+                            spark.pos.y += spark.vel.y * dt();
+                            spark.vel.x *= 0.98; // Friction
+                            spark.vel.y *= 0.98;
+                            spark.opacity -= dt() * 0.8;
+                        });
+                    }
+                });
+            }
+            
+            // Particle shower effect
+            for (let i = 0; i < 100; i++) {
+                wait(rand(0, 3), () => {
+                    const particle = add([
+                        circle(rand(1, 3)),
+                        pos(rand(0, width()), -10),
+                        color(255, 215, 0),
+                        opacity(rand(0.5, 1)),
+                        lifespan(5),
+                        {
+                            vel: { x: rand(-30, 30), y: rand(80, 150) },
+                            twinkle: rand(0, Math.PI * 2)
+                        }
+                    ]);
+                    
+                    particle.onUpdate(() => {
+                        particle.pos.x += particle.vel.x * dt();
+                        particle.pos.y += particle.vel.y * dt();
+                        particle.twinkle += dt() * 8;
+                        particle.opacity = Math.abs(Math.sin(particle.twinkle)) * 0.8 + 0.2;
+                    });
+                });
+            }
+            
+            // Screen flash effect
+            const flash = add([
+                rect(width(), height()),
+                pos(0, 0),
+                color(255, 255, 255),
+                opacity(0.3),
+                lifespan(0.2),
+            ]);
+            
+            flash.onUpdate(() => {
+                flash.opacity -= dt() * 2;
+            });
+        });
+
+        // ============================================
+        // START THE GAME
+        // ============================================
+        go("main");
+    </script>
+</body>
+</html>
