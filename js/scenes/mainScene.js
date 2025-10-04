@@ -111,27 +111,29 @@ export function createMainScene(k) {
             "progressText"
         ]);
 
-        // Character layout
+        // Character layout - optimized for smaller screens
         const rows = [
-            characters.slice(0, 3),
-            characters.slice(3, 7),
-            characters.slice(7, 11)
+            characters.slice(0, 3),    // Row 1: 3 characters
+            characters.slice(3, 7),    // Row 2: 4 characters  
+            characters.slice(7, 11)    // Row 3: 4 characters
         ];
 
-        const startY = 200;
-        const rowSpacing = 220;
+        const startY = 250;  // Start lower to accommodate title
+        const rowSpacing = 200;  // Tighter spacing
         const characterObjects = [];
 
         rows.forEach((row, rowIndex) => {
-            const rowWidth = row.length * 180;
-            const startX = (k.width() - rowWidth) / 2 + 90;
+            const colSpacing = 200;  // Horizontal spacing
+            const rowWidth = row.length * colSpacing;
+            const startX = (k.width() - rowWidth) / 2 + (colSpacing / 2);
 
             row.forEach((char, colIndex) => {
-                const x = startX + colIndex * 180;
+                const x = startX + colIndex * colSpacing;
                 const y = startY + rowIndex * rowSpacing;
 
+                // Glow effect
                 const glow = k.add([
-                    k.circle(65),
+                    k.circle(70),
                     k.pos(x, y),
                     k.color(char.color[0], char.color[1], char.color[2]),
                     k.opacity(0),
@@ -139,72 +141,77 @@ export function createMainScene(k) {
                     { characterName: char.name }
                 ]);
 
-                const character = k.add([
-                    k.circle(60),
+                // Character sprite (using actual images!)
+                const characterSprite = k.add([
+                    k.sprite(char.name.toLowerCase()),
                     k.pos(x, y),
-                    k.color(char.color[0], char.color[1], char.color[2]),
-                    k.area(),
+                    k.scale(0.15),
                     k.anchor("center"),
+                    k.area(),  // Use sprite's natural area
                     k.z(2),
                     "character",
                     {
                         characterData: char,
                         onCooldown: false,
                         glowObj: glow,
-                        baseScale: 1
+                        baseScale: 0.15
                     }
                 ]);
 
+                // Emoji overlay (smaller, in corner)
                 k.add([
-                    k.text(char.emoji, { size: 40 }),
-                    k.pos(x, y),
+                    k.text(char.emoji, { size: 28 }),
+                    k.pos(x + 35, y - 35),
                     k.anchor("center"),
                     k.z(3)
                 ]);
 
+                // Name label
                 k.add([
                     k.text(char.name, {
                         size: 16,
                         font: "sans-serif"
                     }),
-                    k.pos(x, y + 80),
+                    k.pos(x, y + 75),
                     k.anchor("center"),
                     k.color(255, 255, 255),
                     k.z(3)
                 ]);
 
+                // Role label
                 k.add([
                     k.text(char.role, {
                         size: 12,
                         font: "sans-serif"
                     }),
-                    k.pos(x, y + 100),
+                    k.pos(x, y + 95),
                     k.anchor("center"),
                     k.color(180, 180, 200),
                     k.z(3)
                 ]);
 
-                characterObjects.push(character);
+                characterObjects.push(characterSprite);
 
-                character.onHoverUpdate(() => {
-                    if (!character.onCooldown) {
+                // Hover effects
+                characterSprite.onHoverUpdate(() => {
+                    if (!characterSprite.onCooldown) {
                         k.setCursor("pointer");
                         glow.opacity = k.wave(0.3, 0.5, k.time() * 3);
-                        character.scale = k.vec2(1.1, 1.1);
+                        characterSprite.scale = k.vec2(0.18, 0.18);
                     }
                 });
 
-                character.onHoverEnd(() => {
+                characterSprite.onHoverEnd(() => {
                     k.setCursor("default");
-                    if (!character.onCooldown) {
+                    if (!characterSprite.onCooldown) {
                         glow.opacity = 0;
-                        character.scale = k.vec2(1, 1);
+                        characterSprite.scale = k.vec2(0.15, 0.15);
                     }
                 });
 
-                character.onClick(() => {
-                    if (character.onCooldown) return;
-                    handleClick(character, char, x, y);
+                characterSprite.onClick(() => {
+                    if (characterSprite.onCooldown) return;
+                    handleClick(characterSprite, char, x, y);
                 });
             });
         });
@@ -435,11 +442,16 @@ export function createMainScene(k) {
 
             // Cooldown
             character.onCooldown = true;
-            character.color = k.rgb(100, 100, 100);
+            
+            // Dim the sprite during cooldown
+            const originalScale = character.baseScale;
+            character.scale = k.vec2(originalScale * 0.8, originalScale * 0.8);
+            character.opacity = 0.5;
 
             k.wait(1.5, () => {
                 character.onCooldown = false;
-                character.color = k.rgb(charData.color[0], charData.color[1], charData.color[2]);
+                character.scale = k.vec2(originalScale, originalScale);
+                character.opacity = 1;
             });
 
             // Check win condition
@@ -549,15 +561,20 @@ export function createMainScene(k) {
 
             k.get("character").forEach(char => {
                 if (!char.onCooldown) {
-                    const hoverScale = char.isHovering() ? 1.1 : 1;
+                    const baseScale = char.baseScale || 0.15;
+                    const hoverScale = char.isHovering() ? 1.2 : 1;
                     const breathe = k.wave(0.98, 1.02, timeElapsed * 2 + char.pos.x);
-                    char.scale = k.vec2(hoverScale * breathe, hoverScale * breathe);
+                    const finalScale = baseScale * hoverScale * breathe;
+                    char.scale = k.vec2(finalScale, finalScale);
                 }
             });
         });
 
+        // Click anywhere to hide profile (but not immediately after showing)
         k.onClick(() => {
-            profileManager.hideProfile();
+            if (!profileManager.wasJustShown() && profileManager.isProfileShowing()) {
+                profileManager.hideProfile();
+            }
         });
 
         // Instructions
@@ -566,7 +583,7 @@ export function createMainScene(k) {
                 size: 16,
                 align: "center"
             }),
-            k.pos(k.width() / 2, k.height() - 30),
+            k.pos(k.width() / 2, k.height()),
             k.anchor("center"),
             k.color(200, 200, 220),
             k.z(10)

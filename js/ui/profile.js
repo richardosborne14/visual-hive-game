@@ -1,10 +1,11 @@
-// js/ui/profile.js - Fixed to match actual character data structure
+// js/ui/profile.js - Fixed profile timing
 
 export class ProfileManager {
     constructor(k) {
         this.k = k;
         this.currentProfile = null;
         this.profileDisplay = null;
+        this.justShown = false;  // Flag to prevent immediate hiding
     }
 
     // Show character profile
@@ -15,6 +16,12 @@ export class ProfileManager {
         }
 
         this.currentProfile = char;
+        this.justShown = true;  // Set flag
+        
+        // Reset flag after a short delay
+        this.k.wait(0.1, () => {
+            this.justShown = false;
+        });
         
         // Create profile background with rounded corners
         const profileBg = this.k.add([
@@ -113,6 +120,11 @@ export class ProfileManager {
     // Check if profile is showing
     isProfileShowing() {
         return this.currentProfile !== null;
+    }
+
+    // Check if profile was just shown (to prevent immediate hiding)
+    wasJustShown() {
+        return this.justShown;
     }
 
     // Get current profile character

@@ -11,23 +11,35 @@
             box-sizing: border-box;
         }
         
-        body {
+        html, body {
+            min-height: 100vh;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            background-attachment: fixed;
+        }
+
+        body {
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            min-height: 900px;
+            padding: 40px 20px; /* More padding for breathing room */
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
 
         canvas {
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
             border-radius: 10px;
+            display: block;
+            /* This is the key - don't capture pointer events for scrolling */
+            touch-action: auto;
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
     </style>
 </head>
 <body>
-    <!-- Load the modular game -->
     <script type="module" src="js/main.js"></script>
 </body>
 </html>

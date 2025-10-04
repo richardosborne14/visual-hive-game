@@ -1,8 +1,8 @@
 // Game configuration and constants
 
 export const GAME_CONFIG = {
-    width: 1000,
-    height: 600,
+    width: 1200,
+    height: 800,
     background: [20, 20, 40]
 };
 
