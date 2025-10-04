@@ -4,8 +4,8 @@ import { GAME_CONFIG, SPRITES } from './config.js';
 import { createMainScene } from './scenes/mainScene.js';
 import { createVictoryScene } from './scenes/victoryScene.js';
 
-// Initialize Kaboom/Kaplay
-kaboom({
+// ✅ FIXED main.js
+const k = kaboom({
     width: GAME_CONFIG.width,
     height: GAME_CONFIG.height,
     background: GAME_CONFIG.background,
@@ -13,12 +13,12 @@ kaboom({
 
 // Load all sprites
 SPRITES.forEach(sprite => {
-    loadSprite(sprite.name, sprite.path);
+    k.loadSprite(sprite.name, sprite.path);
 });
 
 // Register scenes
-scene("main", createMainScene());
-scene("victory", createVictoryScene());
+k.scene("main", createMainScene(k));  // Pass k here!
+k.scene("victory", createVictoryScene(k));
 
 // Start game
-go("main");
+k.go("main");
