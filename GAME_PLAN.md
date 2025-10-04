@@ -106,25 +106,43 @@
 
 ### Core Loop
 1. Player clicks team member
-2. Ability activates with visual feedback
-3. Progress bar increases
-4. Character goes on cooldown (1-2 seconds)
-5. Repeat until 100% reached
+2. **Dynamic Synergy System Activates:** Connection lines appear showing relationships
+3. Ability activates with character profile popup
+4. Progress bar increases with floating numbers
+5. Character goes on cooldown (1.5 seconds)
+6. Connection ripple effects fade out
+7. Repeat until 100% reached AND all team members explored
 
-### Special Mechanics
-- **Combo System:** Using related characters together (e.g., Richard + Caroline, or Kateryna + Maksym) gives small bonus
-- **Team Synergy:** Some abilities buff others (Kunal multiplies recent abilities, Maksym boosts next person)
-- **Growth System:** Arianne's ability gets stronger over time
-- **Time-Based:** Kateryna stronger during "night" phase of game
+### **NEW: Dynamic Synergy Connection System**
+- **Visual Network:** Real-time connection lines between team members
+- **Connection Types:**
+  - **Leadership Triangle:** Bogdan-Petrica-Kunal (Golden lines)
+  - **Tech Hub:** Richard's extensive network (Blue lines)
+  - **Mentorship:** Arianne with Richard/Dishant (Green lines)
+  - **Cross-functional:** Caroline-Maksym collaboration (Purple lines)
+  - **DevOps Sync:** Kateryna-Maksym-Richard (Blue technical lines)
+- **Interactive Effects:**
+  - **Click Ripples:** Clicking triggers connection cascade
+  - **Hover Previews:** Faint connection hints on mouse hover
+  - **Periodic Pulses:** Random connections appear every 3 seconds
+  - **Secondary Connections:** Connected teammates light up after delay
+
+### Enhanced Mechanics
+- **Team Synergy:** Visual connections show real collaboration patterns
+- **Growth System:** Arianne's ability and character size grows with each use
+- **Boost Chain:** Maksym boosts next teammate clicked
+- **Real Energy:** Thong occasionally shouts "Real!" for bonus
+- **Profile System:** Click to see detailed character profiles with fun facts
 
 ### Win Condition
 - Reach 100% Series A funding progress
-- Celebrate with victory screen
+- **AND** explore all 11 team members (encourages full team interaction)
+- Victory celebration with confetti rain
 - Option to play again
 
 ---
 
-## 🏗️ Development Steps (For Cursor AI)
+## �️ Development Steps (For Cursor AI)
 
 ### ✅ Step 1: Foundation (COMPLETE)
 - Set up Kaboom.js
