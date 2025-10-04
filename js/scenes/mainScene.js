@@ -588,5 +588,160 @@ export function createMainScene(k) {
             k.color(200, 200, 220),
             k.z(10)
         ]);
+
+        // ============================================
+        // CAMERA CONTROL SYSTEM
+        // ============================================
+
+        let cameraY = 0;
+        const CAMERA_SPEED = 300;
+        const MIN_CAMERA_Y = 0; // Can scroll UP to see top better
+        const MAX_CAMERA_Y = 200;  // Can scroll DOWN to see bottom
+
+        // Camera movement with keyboard
+        k.onUpdate(() => {
+            // Arrow keys or WASD - NOW CORRECT!
+            if (k.isKeyDown("down") || k.isKeyDown("s")) {
+                cameraY = Math.min(cameraY + CAMERA_SPEED * k.dt(), MAX_CAMERA_Y);
+            }
+            if (k.isKeyDown("up") || k.isKeyDown("w")) {
+                cameraY = Math.max(cameraY - CAMERA_SPEED * k.dt(), MIN_CAMERA_Y);
+            }
+            
+            // Apply camera position (FIXED: was subtracting, should add)
+            k.camPos(k.width() / 2, k.height() / 2 + cameraY);
+        });
+
+        // ============================================
+        // ON-SCREEN ARROW BUTTONS (TOP-RIGHT, always visible)
+        // ============================================
+
+        const buttonX = k.width() - 50;
+        const buttonBaseY = 150; // Top-right, always visible
+        const buttonSize = 45;
+
+        // Container background with slight transparency
+        k.add([
+            k.rect(65, 115, { radius: 8 }),
+            k.pos(buttonX - 32.5, buttonBaseY - 10),
+            k.color(20, 20, 40),
+            k.opacity(0.9),
+            k.outline(2, k.rgb(100, 100, 150)),
+            k.z(200),
+            k.fixed()
+        ]);
+
+        // UP BUTTON (top)
+        const upBtn = k.add([
+            k.rect(buttonSize, buttonSize, { radius: 6 }),
+            k.pos(buttonX, buttonBaseY),
+            k.anchor("center"),
+            k.color(50, 50, 80),
+            k.outline(2, k.rgb(100, 150, 255)),
+            k.area(),
+            k.z(201),
+            k.fixed(),
+            "panBtn"
+        ]);
+
+        k.add([
+            k.text("▲", { size: 24 }),
+            k.pos(buttonX, buttonBaseY),
+            k.anchor("center"),
+            k.color(255, 255, 255),
+            k.z(202),
+            k.fixed()
+        ]);
+
+        // DOWN BUTTON (bottom)
+        const downBtn = k.add([
+            k.rect(buttonSize, buttonSize, { radius: 6 }),
+            k.pos(buttonX, buttonBaseY + 55),
+            k.anchor("center"),
+            k.color(50, 50, 80),
+            k.outline(2, k.rgb(100, 150, 255)),
+            k.area(),
+            k.z(201),
+            k.fixed(),
+            "panBtn"
+        ]);
+
+        k.add([
+            k.text("▼", { size: 24 }),
+            k.pos(buttonX, buttonBaseY + 55),
+            k.anchor("center"),
+            k.color(255, 255, 255),
+            k.z(202),
+            k.fixed()
+        ]);
+
+        // Button hover effects
+        upBtn.onHoverUpdate(() => {
+            upBtn.color = k.rgb(70, 70, 100);
+            k.setCursor("pointer");
+        });
+
+        upBtn.onHoverEnd(() => {
+            upBtn.color = k.rgb(50, 50, 80);
+            k.setCursor("default");
+        });
+
+        downBtn.onHoverUpdate(() => {
+            downBtn.color = k.rgb(70, 70, 100);
+            k.setCursor("pointer");
+        });
+
+        downBtn.onHoverEnd(() => {
+            downBtn.color = k.rgb(50, 50, 80);
+            k.setCursor("default");
+        });
+
+        // Click handlers with smooth pan
+        upBtn.onClick(() => {
+            const targetY = Math.max(cameraY - 120, MIN_CAMERA_Y);
+            k.tween(cameraY, targetY, 0.3, (val) => {
+                cameraY = val;
+            }, k.easings.easeOutQuad);
+            
+            upBtn.color = k.rgb(100, 150, 255);
+            k.wait(0.1, () => upBtn.color = k.rgb(50, 50, 80));
+        });
+
+        downBtn.onClick(() => {
+            const targetY = Math.min(cameraY + 120, MAX_CAMERA_Y);
+            k.tween(cameraY, targetY, 0.3, (val) => {
+                cameraY = val;
+            }, k.easings.easeOutQuad);
+            
+            downBtn.color = k.rgb(100, 150, 255);
+            k.wait(0.1, () => downBtn.color = k.rgb(50, 50, 80));
+        });
+
+        // Subtle pulse animation
+        upBtn.onUpdate(() => {
+            const pulse = k.wave(0.95, 1, k.time() * 2);
+            upBtn.scale = k.vec2(pulse, pulse);
+        });
+
+        downBtn.onUpdate(() => {
+            const pulse = k.wave(0.95, 1, k.time() * 2 + Math.PI);
+            downBtn.scale = k.vec2(pulse, pulse);
+        });
+
+        // Update instruction text
+        k.destroyAll("instructions"); // Remove old instructions if any
+
+        k.add([
+            k.text("Click team members to use abilities! Use ↑↓ arrows or buttons to pan", {
+                size: 14,
+                align: "center"
+            }),
+            k.pos(k.width() / 2, k.height() - 25),
+            k.anchor("center"),
+            k.color(180, 180, 200),
+            k.z(10),
+            k.fixed(),
+            "instructions"
+        ]);
     };
 }

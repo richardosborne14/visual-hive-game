@@ -101,8 +101,8 @@ export const characters = [
         profile: {
             funFact: "Has never not closed a deal",
             superpower: "Building a pitch deck at midnight with a smile on his face",
-            quote: "[Insert complex sales logic Bogdan doesn't understand here]. Does that make sense?",
-            hobby: "Whiskey tasting"
+            quote: "I could go as low as 7/8ths of your soul, but that's my final offer",
+            hobby: "Loves all the free whiskey he keeps receiving"
         }
     },
     { 
