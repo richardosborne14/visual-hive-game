@@ -1,87 +1,147 @@
-# 🎮 Visual Hive: Quest for Series A
+# 📁 Visual Hive - Modular File Structure
 
-A fun mini-game built for the Visual Hive team to celebrate everyone's unique contributions!
+## File Organization
 
-## 🎯 About
-
-This is a lighthearted RPG-style game where each team member is represented as a character with special abilities. The goal: work together to secure Series A funding for Visual Hive and Erleah!
-
-## 🚀 How to Run
-
-### Option 1: Direct Open (Simplest)
-1. Double-click `index.html`
-2. Game opens in your browser
-3. Done!
-
-### Option 2: VSCode + Live Server (Recommended for Development)
-1. Open the project folder in VSCode
-2. Install "Live Server" extension (if you don't have it)
-3. Right-click `index.html`
-4. Select "Open with Live Server"
-5. Game opens with auto-reload on save!
-
-### Option 3: Python Server
-```bash
-# In the project folder:
-python -m http.server 8000
-# Then open: http://localhost:8000
+```
+your-project/
+├── index.html                  # Main HTML entry point
+├── assets/
+│   └── sprites/               # Character images
+│       ├── bogdan.jpeg
+│       ├── petrica.jpeg
+│       └── ... (other sprites)
+└── js/
+    ├── main.js                # Game entry point
+    ├── config.js              # Game configuration
+    ├── data/
+    │   └── characters.js      # Character data
+    ├── utils/
+    │   └── connections.js     # Connection system
+    ├── ui/
+    │   └── profile.js         # Profile display
+    └── scenes/
+        ├── mainScene.js       # Main game scene
+        └── victoryScene.js    # Victory scene
 ```
 
-## 🎮 How to Play
+## 📋 File Purposes
 
-- Click on team members to activate their special abilities
-- Each ability contributes to your Series A progress
-- Reach 100% to secure funding and win!
-- Each character has a unique personality and power
+### `index.html`
+- Simple HTML entry
+- Loads only `main.js` as module
+- Styles for canvas
 
-## 👥 The Team (Characters)
+### `js/main.js`
+- Game initialization
+- Sprite loading
+- Scene registration
+- Entry point
 
-- **Bogdan** - CEO: Charm Offensive
-- **Petrica** - COO: Reality Check Shield  
-- **Richard** - CTO: Tech Innovation
-- **Dishant** - Lead Dev: Code Perfection
-- **Thong** - Programmer: Lightning Speed
-- **Caroline** - Product Owner: Perfect Prompts
-- **Kunal** - Sales: Omnipresent Sales
-- **Kateryna** - DevOps: Vampire Mode
-- **Maksym** - DevOps: Young Genius Support
-- **Arianne** - Junior Dev: Learning Boost
-- **Iustina** - PM: Mystery Agent Mode
+### `js/config.js`
+- Game dimensions
+- UI configuration
+- Connection settings
+- Character settings
+- Sprite paths
 
-## 🛠️ Tech Stack
+### `js/data/characters.js`
+- Character data array
+- Profile information
+- Connections mapping
+- Helper functions
 
-- **Kaboom.js** - Super simple game framework
-- Pure HTML/CSS/JS - No build process needed
-- Single file for easy deployment
+### `js/utils/connections.js`
+- `ConnectionManager` class
+- Connection drawing logic
+- Color relationships
+- Ripple effects
 
-## 📝 Current Status
+### `js/ui/profile.js`
+- `ProfileManager` class
+- Profile display
+- Profile hiding
+- State management
 
-**Step 1**: ✅ Core foundation with 3 test characters
-**Step 2**: 🔄 Add all 11 team members (NEXT)
-**Step 3**: ⏳ Add unique abilities and mechanics
-**Step 4**: ⏳ Polish and victory conditions
+### `js/scenes/mainScene.js`
+- Main game logic
+- Character creation
+- Click handlers
+- Update loop
+- Progress tracking
 
-## 🎨 Future Enhancements
+### `js/scenes/victoryScene.js`
+- Victory screen
+- Confetti effect
+- Replay option
 
-- Add actual sprite images for each character
-- More complex abilities and interactions
-- Startup "challenges" that appear randomly
-- Sound effects and music
-- Mobile responsive design
-- Save progress
+## 🚀 How to Use
 
-## 🤝 Contributing
+1. **Copy all files** to your project folder
+2. **Keep the folder structure** exactly as shown
+3. **Run with a local server** (VS Code Live Server, or Python server)
+4. **Don't open index.html directly** - modules need a server!
 
-This is a team celebration project! Feel free to:
-- Add your own touches
-- Improve the visuals
-- Add more inside jokes
-- Make it even more fun!
+## 🔧 Development Tips
 
-## 📖 Full Design Document
+### Testing Changes
+- Modify `config.js` for quick tweaks
+- Edit `characters.js` for character updates
+- Scene logic is in `scenes/` folder
 
-See `GAME_PLAN.md` for complete character details, personality traits, and the full development roadmap.
+### Adding Features
+- New utilities → `js/utils/`
+- New UI components → `js/ui/`
+- New scenes → `js/scenes/`
 
----
+### Common Tasks
 
-Built with ❤️ for the Visual Hive team by Richard (with help from Claude and Cursor!)
+**Change game size:**
+```javascript
+// In config.js
+export const GAME_CONFIG = {
+    width: 1200,  // Change this
+    height: 800,  // And this
+    background: [20, 20, 40]
+};
+```
+
+**Add new character:**
+```javascript
+// In data/characters.js
+// Just add to the characters array
+```
+
+**Modify connection colors:**
+```javascript
+// In utils/connections.js
+// Edit getConnectionColor() method
+```
+
+## ⚠️ Important Notes
+
+- **Must use a local server** for ES6 modules
+- All imports use relative paths
+- VS Code Live Server recommended
+- Browser needs to support ES6 modules
+
+## 🐛 Troubleshooting
+
+**"Failed to load module"**
+- Use a local server (Live Server extension)
+- Check file paths are correct
+
+**Sprites not loading**
+- Verify `assets/sprites/` folder exists
+- Check sprite filenames match config.js
+
+**Connection lines not showing**
+- Check console for errors
+- Verify ConnectionManager is imported
+
+## 📝 Next Steps
+
+Ready to add features:
+1. ✅ Character animations (Phase 4)
+2. ✅ Particle effects (Phase 5)
+3. ✅ Sound effects (optional)
+4. ✅ Mobile controls (optional)

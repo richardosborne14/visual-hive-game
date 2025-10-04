@@ -116,7 +116,7 @@
 ### **NEW: Dynamic Synergy Connection System**
 - **Visual Network:** Real-time connection lines between team members
 - **Connection Types:**
-  - **Leadership Triangle:** Bogdan-Petrica-Kunal (Golden lines)
+  - **Leadership Triangle:** Bogdan-Petrica-Richard (Golden lines)
   - **Tech Hub:** Richard's extensive network (Blue lines)
   - **Mentorship:** Arianne with Richard/Dishant (Green lines)
   - **Cross-functional:** Caroline-Maksym collaboration (Purple lines)
