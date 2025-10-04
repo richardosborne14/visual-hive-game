@@ -60,7 +60,7 @@
             ]);
 
             add([
-                text("Click on team members to use their abilities!", { size: 16 }),
+                text("Explore ALL team members to secure Series A!", { size: 16 }),
                 pos(width() / 2, 80),
                 anchor("center"),
                 color(200, 200, 200),
@@ -88,7 +88,8 @@
 
             const characters = [
                 { 
-                    name: "Bogdan", role: "CEO", color: [255, 100, 100], pos: [250, 250], emoji: "🤝", boost: 15,
+                    name: "Bogdan", role: "CEO", color: [255, 100, 100], pos: [200, 220], emoji: "🤝", boost: 15,
+                    connections: ["Petrica", "Kunal"],
                     profile: {
                         funFact: "Can negotiate a deal while doing yoga poses",
                         superpower: "Turning 'No' into 'Yes' with charm",
@@ -97,7 +98,8 @@
                     }
                 },
                 { 
-                    name: "Petrica", role: "COO", color: [75, 75, 150], pos: [500, 250], emoji: "🛡️", boost: 10,
+                    name: "Petrica", role: "COO", color: [75, 75, 150], pos: [450, 220], emoji: "🛡️", boost: 10,
+                    connections: ["Bogdan", "Kunal", "Iustina", "Dishant"],
                     profile: {
                         funFact: "Once organized a team retreat in 24 hours",
                         superpower: "Making chaos look like a perfectly planned strategy",
@@ -106,7 +108,8 @@
                     }
                 },
                 { 
-                    name: "Richard", role: "CTO", color: [100, 150, 255], pos: [750, 250], emoji: "💻", boost: 12,
+                    name: "Richard", role: "CTO", color: [100, 150, 255], pos: [750, 220], emoji: "💻", boost: 12,
+                    connections: ["Caroline", "Kateryna", "Maksym", "Dishant", "Thong", "Iustina", "Arianne", "Kunal"],
                     profile: {
                         funFact: "Codes in 7 languages but still can't order coffee in French",
                         superpower: "Debugging production at 3 AM like a wizard",
@@ -115,7 +118,8 @@
                     }
                 },
                 { 
-                    name: "Dishant", role: "Lead Dev", color: [100, 180, 100], pos: [200, 350], emoji: "🏔️", boost: 13,
+                    name: "Dishant", role: "Lead Dev", color: [100, 180, 100], pos: [150, 380], emoji: "🏔️", boost: 13,
+                    connections: ["Richard", "Petrica", "Iustina", "Arianne"],
                     profile: {
                         funFact: "Climbed mountains on 3 continents while debugging remotely",
                         superpower: "Writing clean code that works on first try",
@@ -124,7 +128,8 @@
                     }
                 },
                 { 
-                    name: "Thong", role: "Programmer", color: [150, 255, 100], pos: [400, 350], emoji: "⚡", boost: 14,
+                    name: "Thong", role: "Programmer", color: [150, 255, 100], pos: [350, 380], emoji: "⚡", boost: 14,
+                    connections: ["Richard"],
                     profile: {
                         funFact: "Can solve algorithms while eating pho",
                         superpower: "Making impossible deadlines possible",
@@ -133,7 +138,8 @@
                     }
                 },
                 { 
-                    name: "Caroline", role: "Product", color: [180, 100, 200], pos: [600, 350], emoji: "✨", boost: 11,
+                    name: "Caroline", role: "Product", color: [180, 100, 200], pos: [550, 380], emoji: "✨", boost: 11,
+                    connections: ["Richard", "Maksym"],
                     profile: {
                         funFact: "User interviews are her favorite form of therapy",
                         superpower: "Turning user complaints into feature gold",
@@ -142,7 +148,8 @@
                     }
                 },
                 { 
-                    name: "Kunal", role: "Sales", color: [255, 140, 50], pos: [800, 350], emoji: "🥃", boost: 13,
+                    name: "Kunal", role: "Sales", color: [255, 140, 50], pos: [750, 380], emoji: "🥃", boost: 13,
+                    connections: ["Bogdan", "Petrica", "Richard"],
                     profile: {
                         funFact: "Closed a deal during a whiskey tasting event",
                         superpower: "Building rapport in under 5 minutes",
@@ -151,7 +158,8 @@
                     }
                 },
                 { 
-                    name: "Kateryna", role: "DevOps", color: [150, 50, 100], pos: [250, 480], emoji: "🦇", boost: 12,
+                    name: "Kateryna", role: "DevOps", color: [150, 50, 100], pos: [200, 520], emoji: "🦇", boost: 12,
+                    connections: ["Richard", "Maksym"],
                     profile: {
                         funFact: "Deploys code at midnight because she's naturally nocturnal",
                         superpower: "Making servers purr like happy cats",
@@ -160,7 +168,8 @@
                     }
                 },
                 { 
-                    name: "Maksym", role: "DevOps", color: [50, 200, 255], pos: [450, 480], emoji: "🧠", boost: 10,
+                    name: "Maksym", role: "DevOps", color: [50, 200, 255], pos: [400, 520], emoji: "🧠", boost: 10,
+                    connections: ["Richard", "Kateryna", "Caroline"],
                     profile: {
                         funFact: "Can predict server failures by reading cloud patterns",
                         superpower: "Infrastructure orchestration that boosts team synergy",
@@ -169,7 +178,8 @@
                     }
                 },
                 { 
-                    name: "Arianne", role: "Junior Dev", color: [255, 150, 150], pos: [650, 480], emoji: "🌱", boost: 8, growth: 0,
+                    name: "Arianne", role: "Junior Dev", color: [255, 150, 150], pos: [600, 520], emoji: "🌱", boost: 8, growth: 0,
+                    connections: ["Richard", "Dishant"],
                     profile: {
                         funFact: "Learns a new programming concept every day",
                         superpower: "Growing stronger with each challenge (literally!)",
@@ -178,7 +188,8 @@
                     }
                 },
                 { 
-                    name: "Iustina", role: "PM", color: [120, 120, 120], pos: [800, 480], emoji: "🕵️", boost: 10,
+                    name: "Iustina", role: "PM", color: [120, 120, 120], pos: [800, 520], emoji: "🕵️", boost: 10,
+                    connections: ["Petrica", "Richard", "Dishant"],
                     profile: {
                         funFact: "Can detect scope creep from a mile away",
                         superpower: "Keeping projects on track with mysterious precision",
@@ -192,8 +203,134 @@
             const charObjects = [];
             let currentProfile = null;
             let profileDisplay = null;
+            let exploredCount = 0;
+            const totalMembers = characters.length;
+            let connections = [];
+            let connectionTime = 0;
+            let activeConnections = new Set();
+
+            const explorationText = add([
+                text(`Team Members Explored: 0/${totalMembers}`, { size: 14 }),
+                pos(width() / 2, 160),
+                anchor("center"),
+                color(255, 215, 0),
+            ]);
+
+            // Create character lookup map for quick access
+            const characterMap = {};
+            characters.forEach(char => {
+                characterMap[char.name] = char;
+            });
+
+            // Function to get connection line color based on characters
+            function getConnectionColor(char1, char2) {
+                if ((char1.name === "Bogdan" && char2.name === "Petrica") || 
+                    (char1.name === "Petrica" && char2.name === "Kunal") ||
+                    (char1.name === "Bogdan" && char2.name === "Kunal")) {
+                    return [255, 215, 0]; // Golden for leadership triangle
+                }
+                if (char1.name === "Richard" || char2.name === "Richard") {
+                    return [100, 150, 255]; // Blue for Richard's tech connections
+                }
+                if ((char1.name === "Arianne" && (char2.name === "Richard" || char2.name === "Dishant")) ||
+                    (char2.name === "Arianne" && (char1.name === "Richard" || char1.name === "Dishant"))) {
+                    return [150, 255, 150]; // Green for mentorship
+                }
+                if ((char1.name === "Caroline" && char2.name === "Maksym") || 
+                    (char1.name === "Maksym" && char2.name === "Caroline")) {
+                    return [180, 100, 200]; // Purple for cross-functional
+                }
+                return [150, 150, 200]; // Default connection color
+            }
+
+            // Function to draw connection line using rectangles
+            function drawConnection(char1, char2, intensity = 1) {
+                const baseColor = getConnectionColor(char1, char2);
+                const thickness = 2;
+                
+                // Calculate line properties
+                const dx = char2.pos[0] - char1.pos[0];
+                const dy = char2.pos[1] - char1.pos[1];
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                // Shorten lines to not overlap with circles
+                const shortenBy = 45;
+                const lineLength = distance - (shortenBy * 2);
+                
+                if (lineLength <= 0) return null;
+                
+                const angle = Math.atan2(dy, dx);
+                const centerX = (char1.pos[0] + char2.pos[0]) / 2;
+                const centerY = (char1.pos[1] + char2.pos[1]) / 2;
+                
+                // Adjust color based on intensity
+                const connectionColor = [
+                    Math.floor(baseColor[0] * intensity),
+                    Math.floor(baseColor[1] * intensity),
+                    Math.floor(baseColor[2] * intensity)
+                ];
+                
+                return add([
+                    rect(lineLength, thickness),
+                    pos(centerX, centerY),
+                    anchor("center"),
+                    rotate(angle),
+                    color(connectionColor[0], connectionColor[1], connectionColor[2]),
+                    z(-1),
+                    "connection",
+                    { char1: char1.name, char2: char2.name, baseIntensity: intensity }
+                ]);
+            }
+
+            // Function to show connections for a character
+            function showCharacterConnections(characterName, intensity = 1) {
+                const char = characterMap[characterName];
+                if (!char || !char.connections) return;
+                
+                char.connections.forEach(connectedName => {
+                    const connectionKey = [characterName, connectedName].sort().join('-');
+                    if (!activeConnections.has(connectionKey)) {
+                        const connectedChar = characterMap[connectedName];
+                        if (connectedChar) {
+                            const connection = drawConnection(char, connectedChar, intensity);
+                            connections.push(connection);
+                            activeConnections.add(connectionKey);
+                        }
+                    }
+                });
+            }
+
+            // Function to clear all connections
+            function clearConnections() {
+                connections.forEach(conn => conn.destroy());
+                connections = [];
+                activeConnections.clear();
+            }
+
+            // Function to trigger connection ripple effect
+            function triggerConnectionRipple(characterName) {
+                clearConnections();
+                showCharacterConnections(characterName, 0.9);
+                
+                // Add secondary connections after a short delay
+                wait(0.2, () => {
+                    const char = characterMap[characterName];
+                    if (char && char.connections) {
+                        char.connections.forEach(connectedName => {
+                            showCharacterConnections(connectedName, 0.5);
+                        });
+                    }
+                });
+                
+                // Clear connections after 2 seconds
+                wait(2, () => {
+                    clearConnections();
+                });
+            }
 
             characters.forEach(char => {
+                // Add explored property to track if character has been clicked
+                char.explored = false;
                 const charCircle = add([
                     circle(40),
                     pos(char.pos[0], char.pos[1]),
@@ -351,6 +488,25 @@
                 const char = charCircle.charData;
                 let boost = char.boost;
 
+                // Trigger connection ripple effect
+                triggerConnectionRipple(char.name);
+
+                // Track if this character is being explored for the first time
+                if (!char.explored) {
+                    char.explored = true;
+                    exploredCount++;
+                    explorationText.text = `Team Members Explored: ${exploredCount}/${totalMembers}`;
+                    
+                    // Add visual indicator for explored character
+                    add([
+                        text("✓", { size: 20 }),
+                        pos(char.pos[0] + 35, char.pos[1] - 35),
+                        anchor("center"),
+                        color(100, 255, 100),
+                        { permanent: true }
+                    ]);
+                }
+
                 if (char.name === "Arianne") {
                     char.growth++;
                     boost = char.boost + char.growth;
@@ -387,8 +543,18 @@
                 progressBar.width = (progressBar.progress / 100) * 396;
                 progressText.text = `Series A Progress: ${Math.floor(progressBar.progress)}%`;
 
-                if (progressBar.progress >= 100) {
+                // Modified win condition: require both 100% progress AND all team members explored
+                if (progressBar.progress >= 100 && exploredCount >= totalMembers) {
                     wait(0.5, () => go("victory"));
+                } else if (progressBar.progress >= 100 && exploredCount < totalMembers) {
+                    // Show message if progress is 100% but not all members explored
+                    add([
+                        text("Explore all team members to secure Series A!", { size: 16 }),
+                        pos(width() / 2, 200),
+                        anchor("center"),
+                        color(255, 100, 100),
+                        lifespan(3),
+                    ]);
                 }
 
                 charCircle.cooldown = true;
@@ -398,13 +564,53 @@
             }
 
             onUpdate(() => {
+                connectionTime += dt();
+                
+                // Periodic connection pulses - show random connections every few seconds
+                if (connectionTime > 3 && connections.length === 0 && !currentProfile) {
+                    connectionTime = 0;
+                    
+                    // Pick a random character and show their connections briefly
+                    const randomChar = characters[Math.floor(Math.random() * characters.length)];
+                    showCharacterConnections(randomChar.name, 0.4);
+                    
+                    // Clear connections after 1.5 seconds
+                    wait(1.5, () => {
+                        clearConnections();
+                    });
+                }
+                
                 const mPos = mousePos();
                 charObjects.forEach(charCircle => {
                     const dist = charCircle.pos.dist(mPos);
                     if (dist < 40 && !charCircle.cooldown) {
                         charCircle.scale = vec2(1.1, 1.1);
+                        
+                        // Show subtle connection hints on hover
+                        if (connections.length === 0 && !currentProfile) {
+                            const char = charCircle.charData;
+                            if (char.connections && char.connections.length > 0) {
+                                // Show very faint connections on hover
+                                char.connections.forEach(connectedName => {
+                                    const connectedChar = characterMap[connectedName];
+                                    if (connectedChar) {
+                                        const connectionKey = [char.name, connectedName].sort().join('-');
+                                        if (!activeConnections.has(connectionKey)) {
+                                            const connection = drawConnection(char, connectedChar, 0.15);
+                                            connections.push(connection);
+                                            activeConnections.add(connectionKey);
+                                        }
+                                    }
+                                });
+                            }
+                        }
                     } else if (!charCircle.cooldown) {
                         charCircle.scale = vec2(1, 1);
+                        
+                        // Clear hover connections when mouse moves away
+                        if (connections.length > 0 && connections[0].baseIntensity === 0.15) {
+                            clearConnections();
+                        }
                     }
                 });
             });
