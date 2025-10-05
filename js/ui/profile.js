@@ -1,4 +1,4 @@
-// js/ui/profile.js - Responsive with clear labels
+// js/ui/profile.js - DYNAMIC HEIGHT VERSION
 
 export class ProfileManager {
     constructor(k) {
@@ -8,9 +8,7 @@ export class ProfileManager {
         this.justShown = false;
     }
 
-    // Show character profile
     showProfile(char, x, y) {
-        // Hide existing profile if any
         if (this.profileDisplay) {
             this.hideProfile();
         }
@@ -18,127 +16,184 @@ export class ProfileManager {
         this.currentProfile = char;
         this.justShown = true;
         
-        // Reset flag after a short delay
         this.k.wait(0.1, () => {
             this.justShown = false;
         });
+
+        // ✅ RESPONSIVE DIMENSIONS
+        const screenWidth = this.k.width();
+        const screenHeight = this.k.height();
+        const isMobile = screenWidth < 600;
         
-        // Responsive sizing
-        const isMobile = this.k.width() < 600;
-        const popupWidth = isMobile ? this.k.width() - 40 : 420;
-        const textWidth = popupWidth - 40;
-        const fontSize = isMobile ? 11 : 12;
-        const labelSize = isMobile ? 12 : 13;
-        const headerSize = isMobile ? 18 : 24;
+        const profileWidth = isMobile ? screenWidth - 40 : Math.min(420, screenWidth - 60);
+        const textWidth = profileWidth - 40;
+        const padding = 20;
         
-        // Create profile background with rounded corners
+        const fontSize = {
+            header: 24,
+            label: 13,
+            text: 12,
+            boost: 16,
+            close: 10
+        };
+
+        const lineHeight = {
+            header: fontSize.header + 20,
+            section: fontSize.label + 8,
+            text: fontSize.text * 1.5,  // Approximate line height
+            boost: fontSize.boost + 10,
+            close: fontSize.close + 10
+        };
+        
+        // ✅ CALCULATE CONTENT HEIGHT DYNAMICALLY
+        let contentHeight = padding; // Top padding
+        
+        // Header
+        contentHeight += lineHeight.header;
+        
+        // Each section: label + text + spacing
+        const sections = [
+            char.profile.superpower,
+            char.profile.quote,
+            char.profile.funFact,
+            char.profile.hobby
+        ];
+        
+        sections.forEach(text => {
+            contentHeight += lineHeight.section; // Label
+            // Estimate text lines (rough calculation)
+            const estimatedLines = Math.ceil(text.length / (textWidth / (fontSize.text * 0.6)));
+            contentHeight += estimatedLines * lineHeight.text;
+            contentHeight += 15; // Section spacing
+        });
+        
+        contentHeight += lineHeight.boost; // Boost text
+        contentHeight += lineHeight.close; // Close instruction
+        contentHeight += padding; // Bottom padding
+        
+        // ✅ Limit height to not exceed screen
+        const maxHeight = screenHeight - 80;
+        const profileHeight = Math.min(contentHeight, maxHeight);
+        
+        // Profile background with click capture
         const profileBg = this.k.add([
-            this.k.rect(popupWidth, 340, { radius: 8 }),
-            this.k.pos(this.k.width() / 2 - popupWidth / 2, this.k.height() / 2 - 170),
+            this.k.rect(profileWidth, profileHeight, { radius: 8 }),
+            this.k.pos(screenWidth / 2, screenHeight / 2),
+            this.k.anchor("center"),
             this.k.color(30, 30, 50),
             this.k.outline(3, this.k.rgb(char.color[0], char.color[1], char.color[2])),
-            this.k.area(),  // ✅ Add area component to catch clicks
+            this.k.area(),
             this.k.z(100),
+            "profileBg"
         ]);
 
-        // Prevent click-through by stopping propagation
-        profileBg.onClick((e) => {
-            // Don't close profile when clicking ON the popup itself
-            // Click handler in mainScene.js will handle clicks OUTSIDE the popup
-            if (e) e.cancel?.();  // Stop event propagation if available
+        profileBg.onClick(() => {
+            // Consume click to prevent click-through
         });
+
+        const contentStartY = screenHeight / 2 - profileHeight / 2 + padding;
+        let currentY = contentStartY;
 
         // Profile header
         const headerText = this.k.add([
             this.k.text(`${char.emoji} ${char.name} - ${char.role}`, { 
-                size: headerSize,
-                width: textWidth 
+                size: fontSize.header,
+                width: textWidth
             }),
-            this.k.pos(this.k.width() / 2, this.k.height() / 2 - 135),
+            this.k.pos(screenWidth / 2, currentY),
             this.k.anchor("center"),
             this.k.color(char.color[0], char.color[1], char.color[2]),
             this.k.z(101),
         ]);
+        currentY += lineHeight.header;
 
         // Superpower section
         const superpowerLabel = this.k.add([
-            this.k.text("⚡ Superpower:", { size: labelSize, width: textWidth }),
-            this.k.pos(this.k.width() / 2 - (popupWidth / 2 - 20), this.k.height() / 2 - 95),
+            this.k.text("⚡ Superpower:", { size: fontSize.label }),
+            this.k.pos(screenWidth / 2 - textWidth / 2, currentY),
             this.k.color(255, 215, 0),
             this.k.z(101),
         ]);
+        currentY += lineHeight.section;
 
         const superpowerText = this.k.add([
-            this.k.text(char.profile.superpower, { size: fontSize, width: textWidth }),
-            this.k.pos(this.k.width() / 2 - (popupWidth / 2 - 20), this.k.height() / 2 - 75),
+            this.k.text(char.profile.superpower, { size: fontSize.text, width: textWidth }),
+            this.k.pos(screenWidth / 2 - textWidth / 2, currentY),
             this.k.color(200, 200, 220),
             this.k.z(101),
         ]);
+        currentY += superpowerText.height + 15;
 
         // Quote section
         const quoteLabel = this.k.add([
-            this.k.text("💬 Signature Quote:", { size: labelSize, width: textWidth }),
-            this.k.pos(this.k.width() / 2 - (popupWidth / 2 - 20), this.k.height() / 2 - 40),
+            this.k.text("💬 Signature Quote:", { size: fontSize.label }),
+            this.k.pos(screenWidth / 2 - textWidth / 2, currentY),
             this.k.color(150, 255, 150),
             this.k.z(101),
         ]);
+        currentY += lineHeight.section;
 
         const quoteText = this.k.add([
-            this.k.text(`"${char.profile.quote}"`, { size: fontSize, width: textWidth }),
-            this.k.pos(this.k.width() / 2 - (popupWidth / 2 - 20), this.k.height() / 2 - 20),
+            this.k.text(`"${char.profile.quote}"`, { size: fontSize.text, width: textWidth }),
+            this.k.pos(screenWidth / 2 - textWidth / 2, currentY),
             this.k.color(200, 200, 220),
             this.k.z(101),
         ]);
+        currentY += quoteText.height + 15;
 
         // Fun fact section
         const funFactLabel = this.k.add([
-            this.k.text("💡 Fun Fact:", { size: labelSize, width: textWidth }),
-            this.k.pos(this.k.width() / 2 - (popupWidth / 2 - 20), this.k.height() / 2 + 15),
+            this.k.text("💡 Fun Fact:", { size: fontSize.label }),
+            this.k.pos(screenWidth / 2 - textWidth / 2, currentY),
             this.k.color(255, 180, 100),
             this.k.z(101),
         ]);
+        currentY += lineHeight.section;
 
         const funFactText = this.k.add([
-            this.k.text(char.profile.funFact, { size: fontSize, width: textWidth }),
-            this.k.pos(this.k.width() / 2 - (popupWidth / 2 - 20), this.k.height() / 2 + 35),
+            this.k.text(char.profile.funFact, { size: fontSize.text, width: textWidth }),
+            this.k.pos(screenWidth / 2 - textWidth / 2, currentY),
             this.k.color(200, 200, 220),
             this.k.z(101),
         ]);
+        currentY += funFactText.height + 15;
 
         // Hobby section
         const hobbyLabel = this.k.add([
-            this.k.text("🎯 Hobbies:", { size: labelSize, width: textWidth }),
-            this.k.pos(this.k.width() / 2 - (popupWidth / 2 - 20), this.k.height() / 2 + 70),
+            this.k.text("🎯 Hobbies:", { size: fontSize.label }),
+            this.k.pos(screenWidth / 2 - textWidth / 2, currentY),
             this.k.color(180, 180, 255),
             this.k.z(101),
         ]);
+        currentY += lineHeight.section;
 
         const hobbyText = this.k.add([
-            this.k.text(char.profile.hobby, { size: fontSize, width: textWidth }),
-            this.k.pos(this.k.width() / 2 - (popupWidth / 2 - 20), this.k.height() / 2 + 90),
+            this.k.text(char.profile.hobby, { size: fontSize.text, width: textWidth }),
+            this.k.pos(screenWidth / 2 - textWidth / 2, currentY),
             this.k.color(200, 200, 220),
             this.k.z(101),
         ]);
+        currentY += hobbyText.height + 15;
 
         // Series A boost
         const boostText = this.k.add([
-            this.k.text(`🚀 Series A Boost: +${char.boost}%`, { size: isMobile ? 14 : 16 }),
-            this.k.pos(this.k.width() / 2, this.k.height() / 2 + 125),
+            this.k.text(`🚀 Series A Boost: +${char.boost}%`, { size: fontSize.boost }),
+            this.k.pos(screenWidth / 2, currentY),
             this.k.anchor("center"),
             this.k.color(100, 255, 100),
             this.k.z(101),
         ]);
+        currentY += lineHeight.boost;
 
         // Close instruction
         const closeText = this.k.add([
-            this.k.text("Click anywhere to close", { size: 10 }),
-            this.k.pos(this.k.width() / 2, this.k.height() / 2 + 155),
+            this.k.text("Click anywhere to close", { size: fontSize.close }),
+            this.k.pos(screenWidth / 2, currentY),
             this.k.anchor("center"),
             this.k.color(150, 150, 150),
             this.k.z(101),
         ]);
 
-        // Store all elements
         this.profileDisplay = [
             profileBg, 
             headerText, 
@@ -155,7 +210,6 @@ export class ProfileManager {
         ];
     }
 
-    // Hide profile
     hideProfile() {
         if (this.profileDisplay) {
             this.profileDisplay.forEach(element => {
@@ -168,17 +222,14 @@ export class ProfileManager {
         }
     }
 
-    // Check if profile is showing
     isProfileShowing() {
         return this.currentProfile !== null;
     }
 
-    // Check if profile was just shown
     wasJustShown() {
         return this.justShown;
     }
 
-    // Get current profile character
     getCurrentProfile() {
         return this.currentProfile;
     }

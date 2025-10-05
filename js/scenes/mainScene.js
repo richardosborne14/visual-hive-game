@@ -20,30 +20,30 @@ export function createMainScene(k) {
 
         // Responsive settings
         const responsive = {
-            // Sprite scaling
-            spriteScale: isMobile ? 0.12 : isTablet ? 0.14 : 0.15,
+            // ✅ SAME SPRITE SCALE FOR ALL DEVICES
+            spriteScale: 0.15,  // Same for mobile, tablet, desktop
             
             // Layout
-            titleSize: isMobile ? 20 : isTablet ? 32 : 48,
+            titleSize: isMobile ? 32 : isTablet ? 32 : 48,  // ✅ Mobile gets tablet size
             titleY: isMobile ? 25 : isTablet ? 35 : 50,
             progressBarY: isMobile ? 70 : isTablet ? 90 : 120,
             progressBarWidth: isMobile ? screenWidth - 40 : Math.min(400, screenWidth - 100),
             instructionY: isMobile ? 140 : isTablet ? 170 : 180,
-            instructionSize: isMobile ? 11 : 14,
+            instructionSize: 14,  // ✅ Same for all devices
             
-            // Character layout
-            startY: isMobile ? 180 : isTablet ? 220 : 250,
-            rowSpacing: isMobile ? 130 : isTablet ? 160 : 200,
+            // Character layout (only spacing differs)
+            startY: isMobile ? 210 : isTablet ? 220 : 250,
+            rowSpacing: isMobile ? 150 : isTablet ? 160 : 200,
             colSpacing: isMobile ? 140 : isTablet ? 180 : 200,
             
-            // Labels
-            labelOffsetY: isMobile ? 60 : 75,
-            roleOffsetY: isMobile ? 75 : 95,
-            nameSize: isMobile ? 13 : 16,
-            roleSize: isMobile ? 10 : 12,
-            emojiSize: isMobile ? 22 : 28,
-            emojiOffsetX: isMobile ? 28 : 35,
-            emojiOffsetY: isMobile ? 28 : 35,
+            // ✅ SAME LABEL SIZES FOR ALL DEVICES
+            labelOffsetY: 75,  // Same for all
+            roleOffsetY: 95,   // Same for all
+            nameSize: 16,      // Same for all
+            roleSize: 12,      // Same for all
+            emojiSize: 28,     // Same for all
+            emojiOffsetX: 35,  // Same for all
+            emojiOffsetY: 35,  // Same for all
             
             // Camera
             maxCameraY: isMobile ? 500 : isTablet ? 300 : 200,
@@ -379,8 +379,11 @@ export function createMainScene(k) {
         function showCombo(count, x, y) {
             if (count < 2) return;
             
+            // ✅ RESPONSIVE COMBO TEXT
+            const comboSize = isMobile ? 28 : 48;
+            
             const comboText = k.add([
-                k.text(`${count}x COMBO!`, { size: 48 }),
+                k.text(`${count}x COMBO!`, { size: comboSize }),
                 k.pos(x, y - 100),
                 k.anchor("center"),
                 k.color(255, 215, 0),
@@ -486,8 +489,15 @@ export function createMainScene(k) {
             const msg = messages[milestone];
             if (!msg) return;
 
+            // ✅ FIXED: No scaling on mobile to prevent overflow
+            const textSize = isMobile ? 28 : 64;
+            const maxScale = isMobile ? 1 : 1.5;  // Don't scale up on mobile!
+
             const announcement = k.add([
-                k.text(msg.text, { size: isMobile ? 40 : 64 }),
+                k.text(msg.text, { 
+                    size: textSize,
+                    align: "center"
+                }),
                 k.pos(screenWidth / 2, screenHeight / 2),
                 k.anchor("center"),
                 k.color(msg.color[0], msg.color[1], msg.color[2]),
@@ -498,13 +508,13 @@ export function createMainScene(k) {
 
             k.tween(0, 1, 0.3, (val) => {
                 announcement.opacity = val;
-                announcement.scale = k.vec2(val * 1.5, val * 1.5);
+                announcement.scale = k.vec2(val * maxScale, val * maxScale);  // ✅ Use maxScale
             }, k.easings.easeOutBack);
 
             k.wait(1.5, () => {
                 k.tween(1, 0, 0.5, (val) => {
                     announcement.opacity = val;
-                    announcement.scale = k.vec2(val * 1.5, val * 1.5);
+                    announcement.scale = k.vec2(val * maxScale, val * maxScale);  // ✅ Use maxScale
                 }, k.easings.easeInBack).then(() => k.destroy(announcement));
             });
 
