@@ -1,4 +1,4 @@
-// js/ui/profile.js - DYNAMIC HEIGHT VERSION
+// js/ui/profile.js - FIXED SCREEN SPACE VERSION
 
 export class ProfileManager {
     constructor(k) {
@@ -40,18 +40,15 @@ export class ProfileManager {
         const lineHeight = {
             header: fontSize.header + 20,
             section: fontSize.label + 8,
-            text: fontSize.text * 1.5,  // Approximate line height
+            text: fontSize.text * 1.5,
             boost: fontSize.boost + 10,
             close: fontSize.close + 10
         };
         
         // ✅ CALCULATE CONTENT HEIGHT DYNAMICALLY
-        let contentHeight = padding; // Top padding
-        
-        // Header
+        let contentHeight = padding;
         contentHeight += lineHeight.header;
         
-        // Each section: label + text + spacing
         const sections = [
             char.profile.superpower,
             char.profile.quote,
@@ -60,22 +57,20 @@ export class ProfileManager {
         ];
         
         sections.forEach(text => {
-            contentHeight += lineHeight.section; // Label
-            // Estimate text lines (rough calculation)
+            contentHeight += lineHeight.section;
             const estimatedLines = Math.ceil(text.length / (textWidth / (fontSize.text * 0.6)));
             contentHeight += estimatedLines * lineHeight.text;
-            contentHeight += 15; // Section spacing
+            contentHeight += 15;
         });
         
-        contentHeight += lineHeight.boost; // Boost text
-        contentHeight += lineHeight.close; // Close instruction
-        contentHeight += padding; // Bottom padding
+        contentHeight += lineHeight.boost;
+        contentHeight += lineHeight.close;
+        contentHeight += padding;
         
-        // ✅ Limit height to not exceed screen
         const maxHeight = screenHeight - 80;
         const profileHeight = Math.min(contentHeight, maxHeight);
         
-        // Profile background with click capture
+        // ✅ FIXED: Profile background with k.fixed() for screen space
         const profileBg = this.k.add([
             this.k.rect(profileWidth, profileHeight, { radius: 8 }),
             this.k.pos(screenWidth / 2, screenHeight / 2),
@@ -84,6 +79,7 @@ export class ProfileManager {
             this.k.outline(3, this.k.rgb(char.color[0], char.color[1], char.color[2])),
             this.k.area(),
             this.k.z(100),
+            this.k.fixed(),  // ✅ ADDED: Stay in screen space!
             "profileBg"
         ]);
 
@@ -94,7 +90,7 @@ export class ProfileManager {
         const contentStartY = screenHeight / 2 - profileHeight / 2 + padding;
         let currentY = contentStartY;
 
-        // Profile header
+        // ✅ FIXED: Profile header with k.fixed()
         const headerText = this.k.add([
             this.k.text(`${char.emoji} ${char.name} - ${char.role}`, { 
                 size: fontSize.header,
@@ -104,15 +100,17 @@ export class ProfileManager {
             this.k.anchor("center"),
             this.k.color(char.color[0], char.color[1], char.color[2]),
             this.k.z(101),
+            this.k.fixed()  // ✅ ADDED
         ]);
         currentY += lineHeight.header;
 
-        // Superpower section
+        // ✅ FIXED: Superpower section with k.fixed()
         const superpowerLabel = this.k.add([
             this.k.text("⚡ Superpower:", { size: fontSize.label }),
             this.k.pos(screenWidth / 2 - textWidth / 2, currentY),
             this.k.color(255, 215, 0),
             this.k.z(101),
+            this.k.fixed()  // ✅ ADDED
         ]);
         currentY += lineHeight.section;
 
@@ -121,15 +119,17 @@ export class ProfileManager {
             this.k.pos(screenWidth / 2 - textWidth / 2, currentY),
             this.k.color(200, 200, 220),
             this.k.z(101),
+            this.k.fixed()  // ✅ ADDED
         ]);
         currentY += superpowerText.height + 15;
 
-        // Quote section
+        // ✅ FIXED: Quote section with k.fixed()
         const quoteLabel = this.k.add([
             this.k.text("💬 Signature Quote:", { size: fontSize.label }),
             this.k.pos(screenWidth / 2 - textWidth / 2, currentY),
             this.k.color(150, 255, 150),
             this.k.z(101),
+            this.k.fixed()  // ✅ ADDED
         ]);
         currentY += lineHeight.section;
 
@@ -138,15 +138,17 @@ export class ProfileManager {
             this.k.pos(screenWidth / 2 - textWidth / 2, currentY),
             this.k.color(200, 200, 220),
             this.k.z(101),
+            this.k.fixed()  // ✅ ADDED
         ]);
         currentY += quoteText.height + 15;
 
-        // Fun fact section
+        // ✅ FIXED: Fun fact section with k.fixed()
         const funFactLabel = this.k.add([
             this.k.text("💡 Fun Fact:", { size: fontSize.label }),
             this.k.pos(screenWidth / 2 - textWidth / 2, currentY),
             this.k.color(255, 180, 100),
             this.k.z(101),
+            this.k.fixed()  // ✅ ADDED
         ]);
         currentY += lineHeight.section;
 
@@ -155,15 +157,17 @@ export class ProfileManager {
             this.k.pos(screenWidth / 2 - textWidth / 2, currentY),
             this.k.color(200, 200, 220),
             this.k.z(101),
+            this.k.fixed()  // ✅ ADDED
         ]);
         currentY += funFactText.height + 15;
 
-        // Hobby section
+        // ✅ FIXED: Hobby section with k.fixed()
         const hobbyLabel = this.k.add([
             this.k.text("🎯 Hobbies:", { size: fontSize.label }),
             this.k.pos(screenWidth / 2 - textWidth / 2, currentY),
             this.k.color(180, 180, 255),
             this.k.z(101),
+            this.k.fixed()  // ✅ ADDED
         ]);
         currentY += lineHeight.section;
 
@@ -172,26 +176,29 @@ export class ProfileManager {
             this.k.pos(screenWidth / 2 - textWidth / 2, currentY),
             this.k.color(200, 200, 220),
             this.k.z(101),
+            this.k.fixed()  // ✅ ADDED
         ]);
         currentY += hobbyText.height + 15;
 
-        // Series A boost
+        // ✅ FIXED: Series A boost with k.fixed()
         const boostText = this.k.add([
             this.k.text(`🚀 Series A Boost: +${char.boost}%`, { size: fontSize.boost }),
             this.k.pos(screenWidth / 2, currentY),
             this.k.anchor("center"),
             this.k.color(100, 255, 100),
             this.k.z(101),
+            this.k.fixed()  // ✅ ADDED
         ]);
         currentY += lineHeight.boost;
 
-        // Close instruction
+        // ✅ FIXED: Close instruction with k.fixed()
         const closeText = this.k.add([
             this.k.text("Click anywhere to close", { size: fontSize.close }),
             this.k.pos(screenWidth / 2, currentY),
             this.k.anchor("center"),
             this.k.color(150, 150, 150),
             this.k.z(101),
+            this.k.fixed()  // ✅ ADDED
         ]);
 
         this.profileDisplay = [
