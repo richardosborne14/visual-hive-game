@@ -38,8 +38,16 @@
             max-width: 100%;
             max-height: 100%;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            image-rendering: crisp-edges;
-            image-rendering: pixelated;
+            
+            /* ✅ REMOVED pixelated rendering - was causing font issues! */
+            /* ✅ ADDED smooth font rendering */
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-smooth: always;
+            
+            /* ✅ Ensure crisp rendering without pixelation */
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: optimize-contrast;
         }
 
         /* Desktop styles */
@@ -49,13 +57,16 @@
             }
         }
 
-        /* Mobile - full screen */
+        /* Mobile - full screen with extra font clarity */
         @media (max-width: 1023px) {
             #game-container {
                 padding: 0;
             }
             canvas {
                 border-radius: 0;
+                /* ✅ Force GPU acceleration for smoother text */
+                transform: translateZ(0);
+                -webkit-transform: translateZ(0);
             }
         }
     </style>
