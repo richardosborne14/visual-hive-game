@@ -1,11 +1,15 @@
 // js/scenes/mainScene.js - FULL ENHANCED VERSION with all visual effects
-import { GAME_CONFIG, UI_CONFIG } from '../config.js';
+import { GAME_CONFIG, UI_CONFIG, CHARACTER_CONFIG, getResponsiveConfig } from '../config.js';
 import { characters } from '../data/characters.js';
 import { ConnectionManager } from '../utils/connections.js';
 import { ProfileManager } from '../ui/profile.js';
 
 export function createMainScene(k) {
     return () => {
+        // Get responsive configuration based on WINDOW width, not canvas width
+        const responsive = getResponsiveConfig(window.innerWidth); // ✅ Use window.innerWidth
+        const { isMobile, isTablet, spriteScale, labelOffsetY, roleOffsetY, layout } = responsive;
+        
         // Track progress and exploration
         let progress = 0;
         let exploredCharacters = new Set();
@@ -58,13 +62,13 @@ export function createMainScene(k) {
             }
         });
 
-        // Title with glow effect
+        // Title with glow effect - RESPONSIVE
         const title = k.add([
             k.text("Visual Hive: Quest for Series A", {
-                size: 48,
+                size: isMobile ? 24 : 48,  // ✅ Much smaller on mobile
                 font: "sans-serif"
             }),
-            k.pos(k.width() / 2, 50),
+            k.pos(k.width() / 2, isMobile ? 30 : 50),  // ✅ Higher up on mobile
             k.anchor("center"),
             k.color(255, 215, 0),
             k.z(10)
@@ -75,9 +79,11 @@ export function createMainScene(k) {
             title.scale = k.vec2(pulse, pulse);
         });
 
-        // Progress bar container
+        // Progress bar container - responsive width
+        const progressBarWidth = isMobile ? k.width() - 40 : UI_CONFIG.progressBar.width;  // ✅ Add padding
+
         k.add([
-            k.rect(UI_CONFIG.progressBar.width + 8, UI_CONFIG.progressBar.height + 8),
+            k.rect(progressBarWidth + 8, UI_CONFIG.progressBar.height + 8),
             k.pos(k.width() / 2, UI_CONFIG.progressBar.y),
             k.anchor("center"),
             k.outline(3, k.rgb(100, 100, 150)),
@@ -87,10 +93,11 @@ export function createMainScene(k) {
 
         const progressBar = k.add([
             k.rect(0, UI_CONFIG.progressBar.height),
-            k.pos(k.width() / 2 - UI_CONFIG.progressBar.width / 2, UI_CONFIG.progressBar.y - UI_CONFIG.progressBar.height / 2),
+            k.pos(k.width() / 2 - progressBarWidth / 2, UI_CONFIG.progressBar.y - UI_CONFIG.progressBar.height / 2),
             k.color(50, 205, 50),
             k.z(6),
-            "progressBar"
+            "progressBar",
+            { maxWidth: progressBarWidth }  // ✅ Store for updateProgressBar
         ]);
 
         k.add([
@@ -111,29 +118,44 @@ export function createMainScene(k) {
             "progressText"
         ]);
 
-        // Character layout - optimized for smaller screens
-        const rows = [
-            characters.slice(0, 3),    // Row 1: 3 characters
-            characters.slice(3, 7),    // Row 2: 4 characters  
-            characters.slice(7, 11)    // Row 3: 4 characters
-        ];
+        // Character layout - RESPONSIVE VERSION 
+        let characterObjects = [];
 
-        const startY = 250;  // Start lower to accommodate title
-        const rowSpacing = 200;  // Tighter spacing
-        const characterObjects = [];
+        // Distribute characters across rows based on layout type
+        const characterRows = [];
+        if (layout.type === 'desktop') {
+            // Desktop: 3, 4, 4
+            characterRows.push(characters.slice(0, 3));
+            characterRows.push(characters.slice(3, 7));
+            characterRows.push(characters.slice(7, 11));
+        } else if (layout.type === 'tablet') {
+            // Tablet: 3, 3, 3, 2
+            characterRows.push(characters.slice(0, 3));
+            characterRows.push(characters.slice(3, 6));
+            characterRows.push(characters.slice(6, 9));
+            characterRows.push(characters.slice(9, 11));
+        } else {
+            // Mobile: 2, 2, 2, 2, 2, 1
+            characterRows.push(characters.slice(0, 2));
+            characterRows.push(characters.slice(2, 4));
+            characterRows.push(characters.slice(4, 6));
+            characterRows.push(characters.slice(6, 8));
+            characterRows.push(characters.slice(8, 10));
+            characterRows.push(characters.slice(10, 11));
+        }
 
-        rows.forEach((row, rowIndex) => {
-            const colSpacing = 200;  // Horizontal spacing
-            const rowWidth = row.length * colSpacing;
-            const startX = (k.width() - rowWidth) / 2 + (colSpacing / 2);
+        characterRows.forEach((row, rowIndex) => {
+            const numInRow = row.length;
+            const rowWidth = numInRow * layout.spacing;
+            const startX = (k.width() - rowWidth) / 2 + (layout.spacing / 2);
 
             row.forEach((char, colIndex) => {
-                const x = startX + colIndex * colSpacing;
-                const y = startY + rowIndex * rowSpacing;
+                const x = startX + colIndex * layout.spacing;
+                const y = layout.startY + rowIndex * layout.rowSpacing;
 
                 // Glow effect
                 const glow = k.add([
-                    k.circle(70),
+                    k.circle(CHARACTER_CONFIG.circleRadius + 20),
                     k.pos(x, y),
                     k.color(char.color[0], char.color[1], char.color[2]),
                     k.opacity(0),
@@ -141,27 +163,27 @@ export function createMainScene(k) {
                     { characterName: char.name }
                 ]);
 
-                // Character sprite (using actual images!)
+                // Character sprite
                 const characterSprite = k.add([
                     k.sprite(char.name.toLowerCase()),
                     k.pos(x, y),
-                    k.scale(0.15),
+                    k.scale(spriteScale),  // ✅ Use destructured variable
                     k.anchor("center"),
-                    k.area(),  // Use sprite's natural area
+                    k.area(),
                     k.z(2),
                     "character",
                     {
                         characterData: char,
                         onCooldown: false,
                         glowObj: glow,
-                        baseScale: 0.15
+                        baseScale: spriteScale  // ✅ Use destructured variable
                     }
                 ]);
 
-                // Emoji overlay (smaller, in corner)
+                // Emoji overlay
                 k.add([
-                    k.text(char.emoji, { size: 28 }),
-                    k.pos(x + 35, y - 35),
+                    k.text(char.emoji, { size: isMobile ? 24 : 28 }),  // ✅ Use destructured variable
+                    k.pos(x + (isMobile ? 30 : 35), y - (isMobile ? 30 : 35)),
                     k.anchor("center"),
                     k.z(3)
                 ]);
@@ -169,10 +191,10 @@ export function createMainScene(k) {
                 // Name label
                 k.add([
                     k.text(char.name, {
-                        size: 16,
+                        size: isMobile ? 14 : 16,  // ✅ Use destructured variable
                         font: "sans-serif"
                     }),
-                    k.pos(x, y + 75),
+                    k.pos(x, y + labelOffsetY),  // ✅ Use destructured variable
                     k.anchor("center"),
                     k.color(255, 255, 255),
                     k.z(3)
@@ -181,10 +203,10 @@ export function createMainScene(k) {
                 // Role label
                 k.add([
                     k.text(char.role, {
-                        size: 12,
+                        size: isMobile ? 10 : 12,  // ✅ Use destructured variable
                         font: "sans-serif"
                     }),
-                    k.pos(x, y + 95),
+                    k.pos(x, y + roleOffsetY),  // ✅ Use destructured variable
                     k.anchor("center"),
                     k.color(180, 180, 200),
                     k.z(3)
@@ -192,27 +214,30 @@ export function createMainScene(k) {
 
                 characterObjects.push(characterSprite);
 
-                // Hover effects
-                characterSprite.onHoverUpdate(() => {
-                    if (!characterSprite.onCooldown) {
-                        k.setCursor("pointer");
-                        glow.opacity = k.wave(0.3, 0.5, k.time() * 3);
-                        characterSprite.scale = k.vec2(0.18, 0.18);
-                    }
-                });
-
-                characterSprite.onHoverEnd(() => {
-                    k.setCursor("default");
-                    if (!characterSprite.onCooldown) {
-                        glow.opacity = 0;
-                        characterSprite.scale = k.vec2(0.15, 0.15);
-                    }
-                });
-
+                // Touch/Click interaction
                 characterSprite.onClick(() => {
                     if (characterSprite.onCooldown) return;
                     handleClick(characterSprite, char, x, y);
                 });
+
+                // Hover effects (desktop only)
+                if (!isMobile) {  // ✅ Use destructured variable
+                    characterSprite.onHoverUpdate(() => {
+                        if (!characterSprite.onCooldown) {
+                            k.setCursor("pointer");
+                            glow.opacity = k.wave(0.3, 0.5, k.time() * 3);
+                            characterSprite.scale = k.vec2(0.18, 0.18);
+                        }
+                    });
+
+                    characterSprite.onHoverEnd(() => {
+                        k.setCursor("default");
+                        if (!characterSprite.onCooldown) {
+                            glow.opacity = 0;
+                            characterSprite.scale = k.vec2(spriteScale, spriteScale);  // ✅ Use destructured variable
+                        }
+                    });
+                }
             });
         });
 
@@ -511,7 +536,8 @@ export function createMainScene(k) {
         }
 
         function updateProgressBar(newProgress) {
-            const targetWidth = (newProgress / 100) * UI_CONFIG.progressBar.width;
+            const progressBarWidth = isMobile ? k.width() - 40 : UI_CONFIG.progressBar.width;
+            const targetWidth = (newProgress / 100) * progressBarWidth;  // ✅ Use responsive width
 
             k.tween(
                 progressBar.width,
@@ -573,21 +599,14 @@ export function createMainScene(k) {
         // Click anywhere to hide profile (but not immediately after showing)
         k.onClick(() => {
             if (!profileManager.wasJustShown() && profileManager.isProfileShowing()) {
-                profileManager.hideProfile();
+                // Only hide if we didn't just show it
+                k.wait(0.05, () => {  // Small delay to ensure profile bg click is processed first
+                    if (profileManager.isProfileShowing()) {
+                        profileManager.hideProfile();
+                    }
+                });
             }
         });
-
-        // Instructions
-        k.add([
-            k.text("Click team members to use their abilities!\nReach 100% and meet everyone to win!", {
-                size: 16,
-                align: "center"
-            }),
-            k.pos(k.width() / 2, k.height()),
-            k.anchor("center"),
-            k.color(200, 200, 220),
-            k.z(10)
-        ]);
 
         // ============================================
         // CAMERA CONTROL SYSTEM
@@ -595,12 +614,11 @@ export function createMainScene(k) {
 
         let cameraY = 0;
         const CAMERA_SPEED = 300;
-        const MIN_CAMERA_Y = 0; // Can scroll UP to see top better
-        const MAX_CAMERA_Y = 200;  // Can scroll DOWN to see bottom
+        const MIN_CAMERA_Y = 0;
+        const MAX_CAMERA_Y = isMobile ? 400 : 200;  // ✅ Double the scroll range on mobile
 
         // Camera movement with keyboard
         k.onUpdate(() => {
-            // Arrow keys or WASD - NOW CORRECT!
             if (k.isKeyDown("down") || k.isKeyDown("s")) {
                 cameraY = Math.min(cameraY + CAMERA_SPEED * k.dt(), MAX_CAMERA_Y);
             }
@@ -608,19 +626,18 @@ export function createMainScene(k) {
                 cameraY = Math.max(cameraY - CAMERA_SPEED * k.dt(), MIN_CAMERA_Y);
             }
             
-            // Apply camera position (FIXED: was subtracting, should add)
             k.camPos(k.width() / 2, k.height() / 2 + cameraY);
         });
 
         // ============================================
-        // ON-SCREEN ARROW BUTTONS (TOP-RIGHT, always visible)
+        // ON-SCREEN ARROW BUTTONS - RESPONSIVE
         // ============================================
 
-        const buttonX = k.width() - 50;
-        const buttonBaseY = 150; // Top-right, always visible
-        const buttonSize = 45;
+        const buttonX = isMobile ? k.width() - 35 : k.width() - 50;
+        const buttonBaseY = isMobile ? k.height() - 120 : 150;
+        const buttonSize = isMobile ? 50 : 45;
 
-        // Container background with slight transparency
+        // Container background
         k.add([
             k.rect(65, 115, { radius: 8 }),
             k.pos(buttonX - 32.5, buttonBaseY - 10),
@@ -631,7 +648,7 @@ export function createMainScene(k) {
             k.fixed()
         ]);
 
-        // UP BUTTON (top)
+        // UP BUTTON
         const upBtn = k.add([
             k.rect(buttonSize, buttonSize, { radius: 6 }),
             k.pos(buttonX, buttonBaseY),
@@ -645,7 +662,7 @@ export function createMainScene(k) {
         ]);
 
         k.add([
-            k.text("▲", { size: 24 }),
+            k.text("▲", { size: isMobile ? 28 : 24 }),
             k.pos(buttonX, buttonBaseY),
             k.anchor("center"),
             k.color(255, 255, 255),
@@ -653,7 +670,7 @@ export function createMainScene(k) {
             k.fixed()
         ]);
 
-        // DOWN BUTTON (bottom)
+        // DOWN BUTTON
         const downBtn = k.add([
             k.rect(buttonSize, buttonSize, { radius: 6 }),
             k.pos(buttonX, buttonBaseY + 55),
@@ -667,7 +684,7 @@ export function createMainScene(k) {
         ]);
 
         k.add([
-            k.text("▼", { size: 24 }),
+            k.text("▼", { size: isMobile ? 28 : 24 }),
             k.pos(buttonX, buttonBaseY + 55),
             k.anchor("center"),
             k.color(255, 255, 255),
@@ -728,19 +745,24 @@ export function createMainScene(k) {
             downBtn.scale = k.vec2(pulse, pulse);
         });
 
-        // Update instruction text
+        // Update instruction text (replace the section at the bottom of createMainScene)
         k.destroyAll("instructions"); // Remove old instructions if any
 
+        // Instructions - positioned in layout between progress bar and sprites
+        const instructionText = isMobile 
+            ? "Tap members! Use ⬆⬇ to pan" 
+            : "Click team members to use abilities! Use ↑↓ arrows or buttons to pan";
+
         k.add([
-            k.text("Click team members to use abilities! Use ↑↓ arrows or buttons to pan", {
-                size: 14,
-                align: "center"
+            k.text(instructionText, {
+                size: isMobile ? 12 : 14,
+                align: "center",
+                width: isMobile ? k.width() - 40 : k.width() - 100
             }),
-            k.pos(k.width() / 2, k.height() - 25),
+            k.pos(k.width() / 2, 180),
             k.anchor("center"),
             k.color(180, 180, 200),
             k.z(10),
-            k.fixed(),
             "instructions"
         ]);
     };

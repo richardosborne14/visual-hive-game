@@ -39,16 +39,6 @@ export const UI_CONFIG = {
         y: 120,
         fillColor: [100, 200, 100],
         bgColor: [60, 60, 80]
-    },
-    exploration: {
-        y: 160,
-        size: 14,
-        color: [255, 215, 0]
-    },
-    footer: {
-        text: "Click team members to secure Series A!",
-        size: 14,
-        color: [150, 150, 150]
     }
 };
 
@@ -60,10 +50,28 @@ export const CONNECTION_CONFIG = {
     secondaryOpacity: 0.5
 };
 
+// Function to get responsive settings based on current width
+export function getResponsiveConfig(width) {
+    const isMobile = width < 600;
+    const isTablet = width >= 600 && width < 900;
+    
+    return {
+        isMobile,
+        isTablet,
+        spriteScale: isMobile ? 0.18 : 0.15,  // ✅ Increased from 0.12 to 0.18
+        labelOffsetY: isMobile ? 60 : 60,
+        roleOffsetY: isMobile ? 80 : 80,
+        cooldownTime: 1.5,
+        layout: {
+            type: isMobile ? 'mobile' : (isTablet ? 'tablet' : 'desktop'),
+            startY: 280,
+            spacing: isMobile ? 180 : (isTablet ? 180 : 200),
+            rowSpacing: isMobile ? 170 : (isTablet ? 170 : 200)  // ✅ Increased spacing
+        }
+    };
+}
+
 export const CHARACTER_CONFIG = {
     circleRadius: 40,
-    spriteScale: 0.25,
-    labelOffsetY: 60,
-    roleOffsetY: 80,
     cooldownTime: 1.5
 };

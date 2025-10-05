@@ -5,12 +5,10 @@ import { createMainScene } from './scenes/mainScene.js';
 import { createVictoryScene } from './scenes/victoryScene.js';
 
 const k = kaboom({
-    width: GAME_CONFIG.width,
+    width: GAME_CONFIG.width,     // ✅ Always use full 1200x800
     height: GAME_CONFIG.height,
     background: GAME_CONFIG.background,
-    scale: 1,
-    stretch: false,
-    letterbox: false,
+    letterbox: true,
     crisp: true
 });
 
